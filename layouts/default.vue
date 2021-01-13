@@ -4,6 +4,7 @@
       v-model="drawer"
       :mini-variant="miniVariant"
       :clipped="clipped"
+      class="teal darken-3"
       fixed
       app
     >
@@ -28,21 +29,29 @@
       :clipped-left="clipped"
       fixed
       app
+      class="teal darken-4"
     >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title v-text="title" />
-      <v-spacer />
+
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+        <v-toolbar-title v-text="title" />
+        <v-spacer />
+    </v-app-bar>
+
+
+
     </v-app-bar>
     <v-main>
       <v-container>
         <nuxt />
       </v-container>
     </v-main>
+
     <v-footer
       :absolute="!fixed"
       app
+      class="teal lighten-1"
     >
-      <span>&copy; {{ new Date().getFullYear() }}</span>
+        <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
   </v-app>
 </template>

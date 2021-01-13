@@ -4,22 +4,34 @@
       v-model="drawer"
       :mini-variant="miniVariant"
       :clipped="clipped"
+      class="teal darken-3"
       fixed
       app
     >
       <v-list>
         <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
+          :to="'/account'"
           router
           exact
         >
           <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
+            <v-icon>mdi-chart-bubble</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
+            <v-list-item-title>Account</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item
+          @click="logout"
+          router
+          exact
+        >
+          <v-list-item-action>
+            <v-icon>mdi-chart-bubble</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Logout</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -28,6 +40,7 @@
       :clipped-left="clipped"
       fixed
       app
+      class="teal darken-4"
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="title" />
@@ -41,6 +54,7 @@
     <v-footer
       :absolute="!fixed"
       app
+      class="teal lighten-1"
     >
       <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
@@ -49,6 +63,25 @@
 
 <script>
 export default {
+    methods: {
+        async logout() {
+            try {
+                let response = await this.$auth.logout();
+                console.log(response)
+                //this.$auth.setUser(response.data);
+                //console.log(this.$auth);
+                //console.log(this.$auth.loggedIn);
+                console.log(this.$auth.user);
+                //console.log(this.$store);
+                //this.$toast.success('Logged Out!');
+                this.$router.push({
+                    path: '/'
+                });
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    },
   data () {
     return {
       clipped: false,
@@ -63,7 +96,7 @@ export default {
         {
           icon: 'mdi-chart-bubble',
           title: 'Logout',
-          to: '/logout'
+          to: '/'
         }
       ],
       miniVariant: false,
