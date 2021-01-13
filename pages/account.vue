@@ -1,55 +1,11 @@
 <template>
   <v-row justify="center" align="center">
     <v-col cols="12">
-      <div class="text-center">
-        <img
-        class="logo"
-        alt="Bevy Chat Logo"
-        src="/logo_color.png" />
-      </div>
-    </v-col>
-
-    <v-col cols="12">
         <v-row>
-            <v-col cols="6" class="text-right">
-                <h1 class='text-h1 bevy-title mb-2'>Bevy</h1>
-                <h2><span class="text-muted pr-2 phonetic font-weight-light">/ˈbevē/</span></h2>
-                <blockquote class='mr-4'>
-                    <p>
-                        <h3 class="bevy-type"><em>noun</em></h3>
-                    </p>
-                    <p>
-                        <ol class='pr-3 definition'>
-                            <li>
-                                <span class="text-muted">1.</span> large group or collection
-                            </li>
-                            <li>
-                                <span class="text-muted">2.</span> a group of animals and especially quail
-                            </li>
-                        </ol>
-                    </p>
-                </blockquote>
+            <v-col cols="12">
+                <h1>My Account</h1>
             </v-col>
 
-            <v-col cols="6">
-                <h1 class='text-h1 bevy-title mb-2'>Chat</h1>
-                <h2><span class="text-muted pl-2 phonetic font-weight-light">/CHat/</span></h2>
-                <blockquote class='ml-4'>
-                    <p>
-                        <h3 class="bevy-type"><em>verb</em></h3>
-                    </p>
-                    <p>
-                        <ol class='pl-3 definition'>
-                            <li>
-                                <span class="text-muted">1.</span> talk in a friendly and informal way.
-                            </li>
-                            <li>
-                                <span class="text-muted">2.</span> to take part in an online discussion in a chat room
-                            </li>
-                        </ol>
-                    </p>
-                </blockquote>
-            </v-col>
         </v-row>
     </v-col>
   </v-row>
@@ -119,7 +75,7 @@ export default {
     layout (context) {
         console.log("Context");
         console.log(context);
-        return 'default'
+        return 'authenticated'
     },
     components: {
         //Logo,

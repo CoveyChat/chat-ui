@@ -9,6 +9,11 @@ export default {
   },
 
   auth: {
+    redirect: {
+        login: '/login',
+        logout: '/',
+        home: '/'
+    },
     strategies: {
         local: {
             token: {
@@ -45,6 +50,7 @@ export default {
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
+    "~/assets/css/global.scss"
   ],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
@@ -67,9 +73,25 @@ export default {
     '@nuxtjs/toast'
   ],
 
+  toast: {
+    position: 'top-right',
+    className: ["site-toaster"],
+    iconPack: "material",
+    duration: 2000,
+    register: [ // Register custom toasts
+      {
+        name: 'my-error',
+        message: 'Oops...Something went wrong',
+        options: {
+          type: 'error'
+        }
+      }
+    ]
+  },
+
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)
   vuetify: {
-    customVariables: ['~/assets/variables.scss'],
+    customVariables: ['~/assets/css/variables.scss'],
     treeShake: true,
     theme: {
       dark: true,

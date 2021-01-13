@@ -136,12 +136,18 @@ export default {
                 //console.log(this.$auth.loggedIn);
                 console.log(this.$auth.user);
                 //console.log(this.$store);
-                this.$toast.success('Logged In!');
+                //this.$toast.success('Logged In!');
+                console.log(this.$store);
+
+                this.$router.push({
+                    path: '/account'
+                });
+
             } catch (err) {
                 console.log(err)
             }
         },
-        async login() {
+        async logout() {
             try {
                 let response = await this.$auth.logout();
                 console.log(response)
@@ -150,16 +156,21 @@ export default {
                 //console.log(this.$auth.loggedIn);
                 console.log(this.$auth.user);
                 //console.log(this.$store);
-                this.$toast.success('Logged In!');
+                //this.$toast.success('Logged Out!');
             } catch (err) {
                 console.log(err)
             }
         }
     },
     layout (context) {
+        console.log(this);
         console.log("Context");
         console.log(context);
-        return 'default'
+        console.log(context.$auth.user);
+
+        return 'default';
+
+
     },
     components: {
         //Logo,
