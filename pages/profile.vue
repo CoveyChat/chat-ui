@@ -12,9 +12,6 @@
     <v-col cols="12">
         <v-row>
             <v-col cols="6" class="text-right">
-                <button type="button" class="btn btn-md btn-primary" @click="login">Login</button>
-                <button type="button" class="btn btn-md btn-primary" @click="logout">Logout</button>
-
                 <h1 class='text-h1 bevy-title mb-2'>Bevy</h1>
                 <h2><span class="text-muted pr-2 phonetic font-weight-light">/ˈbevē/</span></h2>
                 <blockquote class='mr-4'>
@@ -118,44 +115,6 @@
 //import VuetifyLogo from '~/components/VuetifyLogo.vue'
 
 export default {
-    methods: {
-        test() {
-            //console.log(this.$auth);
-            //this.$auth.loginWith('customStrategy', { /* ... */ })
-            //this.$auth.loginWith('local', { data: {auth: {email: "me@jacobrogaishio.com", password: "potatoes"}} });
-            //alert("Hello World");
-            //this.$auth.loginWith('laravelPassport')
-
-        },
-        async login() {
-            try {
-                let response = await this.$auth.login({ data: {auth: {email: "me@jacobrogaishio.com", password: "potatoes"}} });
-                console.log(response)
-                //this.$auth.setUser(response.data);
-                //console.log(this.$auth);
-                //console.log(this.$auth.loggedIn);
-                console.log(this.$auth.user);
-                //console.log(this.$store);
-                this.$toast.success('Logged In!');
-            } catch (err) {
-                console.log(err)
-            }
-        },
-        async login() {
-            try {
-                let response = await this.$auth.logout();
-                console.log(response)
-                //this.$auth.setUser(response.data);
-                //console.log(this.$auth);
-                //console.log(this.$auth.loggedIn);
-                console.log(this.$auth.user);
-                //console.log(this.$store);
-                this.$toast.success('Logged In!');
-            } catch (err) {
-                console.log(err)
-            }
-        }
-    },
     layout (context) {
         console.log("Context");
         console.log(context);

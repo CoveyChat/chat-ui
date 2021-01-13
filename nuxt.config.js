@@ -4,6 +4,31 @@ export default {
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
   ssr: false,
 
+  axios: {
+    baseURL: 'https://devbevy.chat/api/1.0'
+  },
+
+  auth: {
+    strategies: {
+        local: {
+            token: {
+              property: 'data.token',
+              required: true,
+              type: 'Bearer'
+            },
+            user: {
+              property: 'data.user',
+              autoFetch: true
+            },
+            endpoints: {
+              login: { url: 'users/login', method: 'post' },
+              logout: { url: 'users/logout', method: 'post' },
+              user: { url: 'users/whoami', method: 'get' }
+            }
+          }
+    }
+  },
+
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
     titleTemplate: '%s - bevychat-ui',
@@ -37,6 +62,9 @@ export default {
 
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/auth-next',
+    '@nuxtjs/toast'
   ],
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)
