@@ -4,6 +4,29 @@
         <v-row>
             <v-col cols="12">
                 <h1>My Account</h1>
+
+                <p>
+                    <strong>{{ user.name }} </strong><br />
+                    {{ user.email }}
+                </p>
+                <hr />
+                <h1>My Chats</h1>
+
+                <v-list-item three-line
+                    v-for="(item, i) in chats"
+                    :key="i">
+                    <v-list-item-content>
+                        <v-list-item-title>{{ item.chat.name }}</v-list-item-title>
+                        <v-list-item-subtitle>
+                        Created at {{ item.chat.created_at }}
+                        </v-list-item-subtitle>
+                        <v-list-item-subtitle>
+                        https://bevy.chat/chat/{{ item.chat.id }}
+                        </v-list-item-subtitle>
+                    </v-list-item-content>
+                </v-list-item>
+
+
             </v-col>
 
         </v-row>
@@ -73,17 +96,30 @@
 export default {
     middleware: 'auth',
     layout (context) {
-        console.log("Context");
-        console.log(context);
-        return 'authenticated'
+        return 'default'
+    },
+    data () {
+        return {
+            user: {},
+            chats: []
+        }
     },
     components: {
         //Logo,
         //VuetifyLogo
     },
+    methods: {
+        async loadChats() {
+            let chats = await this.$axios.$get('/users/' + this.$auth.user.id + '/chats');
+            this.chats = chats.data;
+            return
+        }
+    },
     mounted() {
         console.log(this.$auth.loggedIn);
         console.log(this.$auth.user);
+        console.log(this.loadChats());
+        this.user = this.$auth.user;
     }
 }
 </script>
