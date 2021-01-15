@@ -1,0 +1,33 @@
+#control-panel-container {
+    position: fixed;
+    z-index:2147483630 !important;
+    right:0px;
+    width:4em;
+}
+
+button.btn {
+    right:10px;
+    border-radius: 2em !important;
+    width: 4em;
+    height: 4em;
+    margin-top:0.5em;
+}
+
+/**Adjust the slash since font awesome doesn't offer a video slash option */
+#btn-local-screenshare-toggle >>> .fa-slash {
+    display:block;
+    margin-top:-20px;
+}
+
+.btn-off {
+    opacity: 0.75;
+}
+
+/*
+When in Fullscreen
+ */
+#control-panel-container.fullscreen {
+    margin-top:0px !important;
+    top:0px;
+    right:0px !important;
+}

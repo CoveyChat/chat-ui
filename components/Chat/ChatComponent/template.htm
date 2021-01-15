@@ -1,0 +1,165 @@
+<div class="d-flex flex-column w-100">
+    <div ref="modalcontainer"></div>
+    <div class="peer-video-rebinding-wait-container">
+        <div  class="peer-video-rebinding-wait text-center"
+            v-if="(ui.fullscreen.target !== null && ui.fullscreen.wait)">
+            <h1><i class="fas fa-video-slash"></i></h1>
+            <span class="sr-only">Connection Lost</span>
+        </div>
+    </div>
+    <div id="user-prompt" v-if="!user.active" name="fade" class="flex-row flex-grow-1">
+        <div class="row">
+            <div class="col-sm-12 offset-md-3 col-md-6 offset-lg-4 col-lg-4 ">
+                <div class="card card-body p-5 text-center">
+                    <h1>{{chatName}}</h1>
+                    <br />
+                    <p>
+                        <input type="text"
+                        class="form-control form-control-xl text-center"
+                        placeholder="Enter your name"
+                        v-model="ui.anonUsername"
+                        v-on:keyup.enter="setAnonUser" />
+                        <transition name="fade">
+                        <button class="btn btn-lg btn-outline-primary btn-block mt-3" v-on:click="setAnonUser" v-if="ui.anonUsername.length >= 1">
+                            Start Chatting
+                        </button>
+                        </transition>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="chat-container flex-row flex-fill"
+        v-bind:class="{ 'peer-video-fullscreen': ui.fullscreen.active }"
+        v-if="user.active">
+        <button class="btn-leave-chat btn btn-danger" v-on:click="confirmLeave">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="sr-only">Leave Chat</span>
+        </button>
+
+
+
+
+
+        <ControlsComponent
+            v-bind:inFullscreen="ui.fullscreen.active"
+            v-bind:deviceAccess="ui.deviceAccess"
+            v-bind:isMobile="user.isMobile"
+            v-bind:videoEnabled="stream.videoenabled"
+            v-bind:audioEnabled="stream.audioenabled"
+            v-bind:screenshareEnabled="stream.screenshareenabled"
+            v-bind:videoDevices="user.devices.video"
+
+            v-on:toggle-video="toggleVideo"
+            v-on:toggle-audio="toggleAudio"
+            v-on:toggle-screenshare="toggleScreenshare"
+            v-on:swap-video-feed="swapVideoFeed"
+            v-on:change-settings="changeSettings"
+        >
+        </ControlsComponent>
+
+
+
+
+
+
+        <div id="local-video-container" v-draggable v-on:draggable-onclick="adjustLocalVideoSize"
+            v-bind:class="{
+                        'local-video-overlay': ui.fullscreen.active,
+                        'local-video-sm': stream.localsize =='sm',
+                        'local-video-md': stream.localsize =='md',
+                        'local-video-lg': stream.localsize =='lg'
+                    }"
+            v-if="stream.videoenabled || stream.screenshareenabled"
+            >
+
+            <div id="local-video-volume-meter" class="progress progress-bar-vertical">
+                <div class="progress-bar bg-success" role="progressbar" v-bind:style="{'height': currentVolume + '%'}" :aria-valuenow="currentVolume" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar bg-danger" role="progressbar" v-bind:style="{'height': saturatedVolume + '%'}" :aria-valuenow="saturatedVolume" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+
+            <video :srcObject.prop="stream.connection"
+
+                    poster = "https://bevy.chat/img/video_poster.png"
+                    autoplay="autoplay"
+                    muted="muted"
+                    class="local-stream"
+                    playsinline>
+            </video>
+
+
+
+
+        </div>
+
+        <NetworkGraphComponent
+            ref="networkGraph"
+            class="mb-3"
+            v-bind:inFullscreen="ui.fullscreen.active">
+        </NetworkGraphComponent>
+
+        <div id="peer-video-container" class="container-fluid" v-bind:class="{ 'peer-video-fullscreen': ui.fullscreen.active }">
+            <div class="row justify-content-center video-connections flex-fill">
+            <div v-if="peerStreams.length == 0" class="no-video-connections">
+                <h1><i class="fas fa-broadcast-tower"></i><i class="fas fa-slash tower-slash"></i></h1>
+                <p>Nobody is streaming</p>
+            </div>
+            <div v-for="peer in peerStreams"
+                :key="peer.id"
+                :class="{
+                    'col-sm-6 col-md-6 col-lg-4': (peerStreams.length <= 3),
+                    'col-sm-4 col-md-4 col-lg-2': (peerStreams.length > 3)
+                }"
+                class="col-ml-auto embed-responsive embed-responsive-4by3">
+
+                <PeerVideoComponent
+                ref="peerVideos"
+                v-bind:peer="peer"
+                v-bind:startFullscreen="peer.startFullscreen"
+                v-on:openFullscreen=" ui.fullscreen.active = true; ui.fullscreen.target = peer.hostid;"
+                v-on:closeFullscreen="ui.fullscreen.active = false; ui.fullscreen.target = null;">
+                </PeerVideoComponent>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex" v-if="ui.fullscreen.active">
+        <button class="btn btn-md btn-primary btn-show-messages"
+            v-bind:class="{'btn-off': !ui.showMessagesFullscreen}"
+            v-on:click="ui.showMessagesFullscreen = !ui.showMessagesFullscreen">
+            <span class="sr-only">Show messages Panel</span>
+            <i class="fas fa-comment" v-if="!ui.showMessagesFullscreen"></i>
+            <i class="fas fa-comment-slash" v-if="ui.showMessagesFullscreen"></i>
+        </button>
+    </div>
+
+    <MessageLogComponent
+        v-bind:chatLog="chatLog" v-if="user.active"
+        v-bind:inFullscreen="ui.fullscreen.active"
+        v-bind:showMessagesFullscreen="ui.showMessagesFullscreen">
+    </MessageLogComponent>
+
+    <div class="flex-column message-box"
+        v-if="user.active"
+        v-bind:class="{
+            'peer-video-fullscreen': (ui.fullscreen.active && ui.showMessagesFullscreen),
+            'chat-disabled': (Object.keys(connections).length == 0)}">
+        <div class="input-group">
+            <input type="text"
+                v-model="message"
+                id="message-box"
+                class="form-control"
+                :placeholder="(Object.keys(connections).length == 0 ? 'Nobody is here' : 'Type a message')"
+                :disabled="(Object.keys(connections).length == 0)"
+                v-on:keyup.enter="sendMessage" />
+            <div class="input-group-btn">
+                <button class="btn btn-primary" type="button"  id="send" v-on:click="sendMessage">
+                    <span class="sr-only">Send Message</span>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    </div>

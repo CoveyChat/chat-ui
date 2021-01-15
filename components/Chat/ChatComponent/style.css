@@ -1,0 +1,167 @@
+.btn {
+    border-radius: 0px;
+}
+
+/*Place this behind the controls and local video but infront of everything else */
+.peer-video-rebinding-wait {
+    z-index:2147483620;
+    background:#000;
+    color:#fff;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.peer-video-rebinding-wait >>> h1 {
+    margin-top:50vh;
+}
+#message-box {
+    border-radius:0px;
+}
+/*Place this infront of the rebinding thing*/
+.btn-show-messages {
+    z-index:2147483621;
+}
+.no-video-connections {
+    padding: 4vh;
+    text-align: center;
+}
+.chat-disabled >>> input {
+    opacity:.5;
+}
+.chat-disabled >>> button {
+    opacity:.5;
+}
+.btn-leave-chat {
+    position: absolute;
+    width: 25%;
+    top: 0px;
+    left: 50%;
+    margin-top: 6px;
+    margin-left: -12.5%;
+}
+.video-connections {
+    background: #eee;
+    color:#555;
+    padding: 1vh;
+    border-radius: 5px;
+    box-shadow: 0px 1px 3px #ccc;
+}
+.no-video-connections >>> h1 {
+    height:2em;
+}
+.no-video-connections >>> i {
+    position: absolute;
+    /*Center the icons*/
+    left: 0;
+    right: 0;
+}
+
+.btn-off {
+    opacity: 0.75;
+}
+
+
+/*Remove any previous positions*/
+.is-draggable {
+    top:unset;
+    bottom: unset;
+    right:unset;
+    left:unset;
+}
+
+video {
+    border-radius: 5px;
+    box-shadow: 0px 1px 3px #000;
+}
+video.peer-video-fullscreen {
+    box-shadow: none;
+}
+
+/**Adjust the slash since font awesome doesn't offer a video slash option */
+#btn-local-screenshare-toggle >>> .fa-slash {
+    display:block;
+    margin-top:-20px;
+}
+
+#local-video-container.local-video-sm,
+#local-video-container.local-video-sm >>> video {
+    margin-right:25px;
+    width:100px;
+}
+#local-video-container.local-video-md,
+#local-video-container.local-video-md >>> video {
+    width:200px;
+}
+#local-video-container.local-video-lg,
+#local-video-container.local-video-lg >>> video {
+    width:300px;
+}
+
+.progress-bar-vertical {
+    width: 20px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.progress-bar-vertical .progress-bar {
+    width: 100%;
+    height: 0;
+    -webkit-transition: height 0.6s ease;
+    -o-transition: height 0.6s ease;
+    transition: height 0.6s ease;
+}
+
+
+#local-video-volume-meter {
+    width: 5px;
+    height: 95%;
+    display: flex;
+    align-items: flex-end;
+    position: absolute;
+    right: -1px;
+    bottom: 5%;
+    opacity: 0.75;
+}
+
+/* Initial position */
+#local-video-container {
+    margin-top:20px;
+    position:fixed;
+    right:5em;
+    border-radius:3px;
+    z-index: 2147483638;
+}
+
+/* When fullscreened, shift things around*/
+.chat-container.peer-video-fullscreen {
+    height:0px !important;
+}
+
+#local-video-container.local-video-overlay,
+#local-video-container.local-video-overlay >>> video {
+    margin-right:0px;
+    bottom:0px;
+    right:0px;
+}
+
+.message-box.peer-video-fullscreen {
+    z-index:2147483622;
+}
+
+/*Videos container shrink so messages and stuff shows correctly*/
+#peer-videos-container.peer-video-fullscreen >>> .video-connections {
+    height:0px;
+}
+
+/* Main Video Fullscreen */
+#user-prompt {
+    margin-top:10%;
+}
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
+}

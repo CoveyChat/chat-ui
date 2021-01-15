@@ -10,13 +10,20 @@
     "test": "jest"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.2",
     "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/auth-next": "^5.0.0-1610375166.4d8db9d",
     "@nuxtjs/axios": "^5.12.5",
     "@nuxtjs/toast": "^3.3.1",
     "core-js": "^3.6.5",
+    "d3": "^6.3.1",
+    "hark": "^1.2.3",
     "nuxt": "^2.14.6",
-    "nuxt-material-design-icons": "^1.0.4"
+    "nuxt-material-design-icons": "^1.0.4",
+    "sdp-transform": "^2.14.1",
+    "simple-peer": "^9.9.3",
+    "socket.io": "^2.4.1",
+    "webrtc-adapter": "^7.7.0"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.11.2",

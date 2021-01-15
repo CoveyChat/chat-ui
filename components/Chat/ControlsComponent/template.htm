@@ -1,0 +1,91 @@
+<div id="control-panel-container"
+    v-bind:class="{
+        'fullscreen': inFullscreen
+    }">
+    <!--Settings Button-->
+    <button
+        class="btn btn-secondary"
+        type="button"
+        id="btn-local-video-toggle"
+        v-bind:class="{
+            'btn-off': !videoEnabled,
+            'local-video-overlay': inFullscreen
+        }"
+        @click="$emit('change-settings')">
+
+        <span class="sr-only">Settings</span>
+        <i class="fas fa-cog"></i>
+    </button>
+
+
+    <!--Local Video Button-->
+    <button
+        class="btn btn-primary"
+        type="button"
+        id="btn-local-video-toggle"
+        v-bind:class="{
+            'btn-off': !videoEnabled,
+            'local-video-overlay': inFullscreen
+        }"
+        v-if="deviceAccess"
+        @click="$emit('toggle-video')">
+
+        <span class="sr-only" v-if="!videoEnabled">Start Video</span>
+        <i class="fas fa-video-slash" v-if="!videoEnabled"></i>
+
+        <span class="sr-only" v-if="videoEnabled">Stop Video</span>
+        <i class="fas fa-video" v-if="videoEnabled"></i>
+    </button>
+
+    <!--Local Audio Button-->
+    <button class="btn btn-danger"
+        type="button"
+        id="btn-local-audio-toggle"
+        v-bind:class="{
+            'btn-off': !audioEnabled,
+            'local-audio-overlay': inFullscreen
+        }"
+        v-if="videoEnabled || screenshareEnabled"
+        @click="$emit('toggle-audio')">
+
+        <span class="sr-only" v-if="!audioEnabled">Enable Audio</span>
+        <i class="fas fa-microphone-slash" v-if="!audioEnabled"></i>
+
+        <span class="sr-only" v-if="audioEnabled">Mute Video</span>
+        <i class="fas fa-microphone" v-if="audioEnabled"></i>
+    </button>
+
+    <!--Local Screenshare Button-->
+    <button class="btn btn-success"
+        type="button"
+        id="btn-local-screenshare-toggle"
+        v-bind:class="{
+            'btn-off': !screenshareEnabled,
+            'local-screenshare-overlay': inFullscreen
+        }"
+        v-if="(videoEnabled || screenshareEnabled) && !isMobile"
+        @click="$emit('toggle-screenshare')">
+
+        <span class="sr-only" v-if="!screenshareEnabled">Enable Screenshare</span>
+        <i class="fas fa-desktop" v-if="!screenshareEnabled"></i>
+        <i class="fas fa-slash" v-if="!screenshareEnabled"></i>
+
+        <span class="sr-only" v-if="screenshareEnabled">Stop Sharing</span>
+        <i class="fas fa-desktop" v-if="screenshareEnabled"></i>
+    </button>
+
+    <!--Switch Video Feed Button-->
+    <button class="btn btn-primary"
+        type="button"
+        id="btn-local-swapvideo-toggle"
+        v-bind:class="{
+            'local-swapvideo-overlay': inFullscreen
+        }"
+        v-if="videoEnabled && videoDevices.length > 1"
+        @click="$emit('swap-video-feed')">
+
+        <span class="sr-only">Switch Video</span>
+        <i class="fas fa-sync-alt"></i>
+    </button>
+
+</div>
