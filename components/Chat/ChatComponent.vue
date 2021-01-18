@@ -3,7 +3,7 @@
 
 <script>
 
-//import Draggable from '../directives/Draggable.js';
+import Draggable from '../directives/Draggable.js';
 import SoundEffect from '../models/SoundEffect.js';
 import User from '../models/User.js';
 import Message from '../models/Message.js';
@@ -23,7 +23,8 @@ export default {
     components: {
         ControlsComponent,
         NetworkGraphComponent,
-        MessageLogComponent
+        MessageLogComponent,
+        PeerVideoComponent
     },
     props: {
         chatName: String
@@ -435,7 +436,7 @@ export default {
             }
             //console.log("Sending");
             //console.log(networkChartData);
-            self.$refs.networkGraph.update(networkChartData);
+            //self.$refs.networkGraph.update(networkChartData);
 
         },
         /**

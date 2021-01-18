@@ -194,6 +194,9 @@
                     return self.tooltip.style("visibility", "hidden");
                 }
 
+                console.log(d3);
+                console.log(d3.event);
+
                 return self.tooltip
                     .style("top", (d3.event.pageY - 50)+"px")
                     .style("left",(d3.event.pageX - ((node.name.length * 8) / 2))+"px")

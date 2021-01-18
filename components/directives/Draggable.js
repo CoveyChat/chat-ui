@@ -1,3 +1,4 @@
+import Vue from 'vue';
 
 Vue.directive('draggable', {
     data: function () {
@@ -6,7 +7,7 @@ Vue.directive('draggable', {
         }
     },
     bind: function(el) {
-        this.event = new Event('draggable-onclick');
+        var event = new Event('draggable-onclick');
 
         //Watch out for orientation change and the element disappearing
         window.addEventListener("orientationchange", function(e) {
@@ -29,8 +30,8 @@ Vue.directive('draggable', {
         });
 
         el.style.position = 'absolute';
-        var self, startX, startY, initialMouseX, initialMouseY, deadzoned;
-        self = this;
+        var startX, startY, initialMouseX, initialMouseY, deadzoned;
+
         function onMove(x, y) {
             var dx = x - initialMouseX;
             var dy = y - initialMouseY;
@@ -58,7 +59,7 @@ Vue.directive('draggable', {
 
         function movedone(e) {
             if(deadzoned) {
-                el.dispatchEvent(self.event);
+                el.dispatchEvent(event);
             }
             //Dirty way to keep the attribute incase there's any trickle down events
             setTimeout(function() {

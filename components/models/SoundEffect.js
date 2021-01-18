@@ -2,13 +2,13 @@ export default class SoundEffect {
     constructor() {
         this.sound = {};
 
-        this.sound.connect = new Audio("/media/join.mp3");
+        this.sound.connect = new Audio("/sounds/join.mp3");
         this.sound.connect.waitUntil = Date.now();
 
-        this.sound.disconnect = new Audio("/media/leave.mp3");
+        this.sound.disconnect = new Audio("/sounds/leave.mp3");
         this.sound.disconnect.waitUntil = Date.now();
 
-        this.sound.message = new Audio("/media/message.mp3");
+        this.sound.message = new Audio("/sounds/message.mp3");
         this.sound.message.waitUntil = Date.now();
     }
 
