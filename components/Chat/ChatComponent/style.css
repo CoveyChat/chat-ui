@@ -78,6 +78,17 @@ video {
 video.peer-video-fullscreen {
     box-shadow: none;
 }
+.peer-user-no-stream {
+    background:#000;
+    color:#ccc;
+    padding-top:40%;
+    width:40%;
+    margin-left:auto;
+    margin-right:auto;
+}
+.peer-user-no-stream-name {
+    margin-top:-50%;
+}
 
 /**Adjust the slash since font awesome doesn't offer a video slash option */
 #btn-local-screenshare-toggle >>> .fa-slash {

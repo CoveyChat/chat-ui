@@ -100,26 +100,25 @@
 
         <div id="peer-video-container" class="container-fluid" v-bind:class="{ 'peer-video-fullscreen': ui.fullscreen.active }">
             <div class="row justify-content-center video-connections flex-fill">
-            <div v-if="peerStreams.length == 0" class="no-video-connections">
-                <h1><i class="fas fa-broadcast-tower"></i><i class="fas fa-slash tower-slash"></i></h1>
-                <p>Nobody is streaming</p>
-            </div>
-            <div v-for="peer in peerStreams"
-                :key="peer.id"
-                :class="{
-                    'col-sm-6 col-md-6 col-lg-4': (peerStreams.length <= 3),
-                    'col-sm-4 col-md-4 col-lg-2': (peerStreams.length > 3)
-                }"
-                class="col-ml-auto embed-responsive embed-responsive-4by3">
-
-                <PeerVideoComponent
-                ref="peerVideos"
-                v-bind:peer="peer"
-                v-bind:startFullscreen="peer.startFullscreen"
-                v-on:openFullscreen=" ui.fullscreen.active = true; ui.fullscreen.target = peer.hostid;"
-                v-on:closeFullscreen="ui.fullscreen.active = false; ui.fullscreen.target = null;">
-                </PeerVideoComponent>
-            </div>
+                <div v-for="peer in connections"
+                    :key="peer.id"
+                    :class="{
+                        'col-sm-6 col-md-6 col-lg-4': (peerStreams.length <= 3),
+                        'col-sm-4 col-md-4 col-lg-2': (peerStreams.length > 3)
+                    }"
+                    class="col-ml-auto embed-responsive embed-responsive-4by3">
+                    <div v-if="peer.stream == null" class="peer-user-no-stream">
+                        <div class="peer-user-no-stream-name">{{peer.user.name}}</div>
+                    </div>
+                    <PeerVideoComponent
+                        ref="peerVideos"
+                        v-bind:peer="peer"
+                        v-bind:startFullscreen="peer.startFullscreen"
+                        v-on:openFullscreen=" ui.fullscreen.active = true; ui.fullscreen.target = peer.hostid;"
+                        v-on:closeFullscreen="ui.fullscreen.active = false; ui.fullscreen.target = null;"
+                        v-if="peer.stream != null">
+                    </PeerVideoComponent>
+                </div>
             </div>
         </div>
     </div>

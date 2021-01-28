@@ -21,7 +21,7 @@
                         Created at {{ item.chat.created_at }}
                         </v-list-item-subtitle>
                         <v-list-item-subtitle>
-                        https://bevy.chat/chat/{{ item.chat.id }}
+                            <a :href="'/chat/?id=' + item.chat.id">https://bevy.chat/chat/{{ item.chat.id }}</a>
                         </v-list-item-subtitle>
                     </v-list-item-content>
                 </v-list-item>

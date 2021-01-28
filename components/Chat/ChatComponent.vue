@@ -810,16 +810,14 @@ mounted() {
     //Hide the video button since they don't support mediaDevices
     self.ui.deviceAccess = typeof navigator.mediaDevices != 'undefined';
 
-    self.user = new User();
+    self.user = new User(this.$auth.user || {});
 
     //Discover and set the devices before we init stuff
     self.user.discoverDevices(function(devices) {
-        self.user.auth().then(function(response) {
-            //Prompt for a name
-            if(response.success) {
-                self.init();
-            }
-        });
+        //Prompt for a name
+        if(self.user.active) {
+            self.init();
+        }
     });
 
 }

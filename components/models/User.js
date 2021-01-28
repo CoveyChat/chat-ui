@@ -1,54 +1,20 @@
 
 export default class User {
     //Gets the current authenticated user
-    constructor() {
-        var self = this;
-        self.id
-        self.name
-        self.email
-        self.avatar
-        self.token
-        self.verified
-        self.active;
+    constructor(user) {
+        let self = this;
+        self.id = user.id || null;
+        self.name = user.name || null;
+        self.email = user.email || null;
+        self.avatar = user.avatar || null;
+        self.token = user.token || null;
+        self.verified = !!user.email || false;
+        self.active = !!user.email || false;
         self.devices = {video: [], audio: [], active: {video: null, audio: null}};
         self.isMobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent));
         self.preferredBandwidth = (self.isMobile ? 'low' : 'high'); //Low quality for mobile, high for desktop
 
-        //this.transport = axios.create({
-        //    withCredentials: true
-        //});
-
-        //Used to determine if the user object has been instantiated
-        self.active = false;
-    }
-
-    auth() {
-        var self = this;
-
-        //Get this chat database record
-        return this.$axios.get('/api/1.0/users/whoami').then(response => {
-            //console.log(response.data);
-            self.id = response.data.data.id;
-            self.name = response.data.data.name;
-            self.email = response.data.data.email;
-            self.token = response.data.data.token;
-            self.verified = true;
-            self.active = true;
-            return response.data;
-        }).catch(error => {
-            if (error.response.status === 401) {
-                //Prop up an empty user data object
-                return {
-                    success: false,
-                    message: '',
-                    data: {
-                        id: null,
-                        name: self.name,
-                        verified: false
-                    }
-                }
-            }
-        });
+        console.log("NAME: " + this.name + "~!");
     }
 
     getVideoDevices() {
