@@ -84,21 +84,21 @@ export default {
           click: () => {}
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-login-variant',
           title: 'Login / Register',
           to: '/login',
           view: {auth: false, default: true},
           click: () => {}
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-account-circle-outline',
           title: 'Account',
           to: '/account',
           view: {auth: true, default: false},
           click: () => {}
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-logout-variant',
           title: 'Logout',
           to: null,
           view: {auth: true, default: false},

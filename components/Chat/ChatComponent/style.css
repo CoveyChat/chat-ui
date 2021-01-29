@@ -40,9 +40,11 @@
     left: 50%;
     margin-top: 6px;
     margin-left: -12.5%;
+    background:#f00;
 }
 .video-connections {
     background: #eee;
+    min-height: 20vh;
     color:#555;
     padding: 1vh;
     border-radius: 5px;

@@ -19,8 +19,8 @@
 
 
     <!--Local Video Button-->
-    <button
-        class="btn btn-primary"
+    <v-btn
+        color="blue darken-3"
         type="button"
         id="btn-local-video-toggle"
         v-bind:class="{
@@ -31,14 +31,14 @@
         @click="$emit('toggle-video')">
 
         <span class="sr-only" v-if="!videoEnabled">Start Video</span>
-        <i class="fas fa-video-slash" v-if="!videoEnabled"></i>
+        <v-icon v-if="!videoEnabled">mdi-video-off</v-icon>
 
         <span class="sr-only" v-if="videoEnabled">Stop Video</span>
-        <i class="fas fa-video" v-if="videoEnabled"></i>
-    </button>
+        <v-icon v-if="videoEnabled">mdi-video</v-icon>
+    </v-btn>
 
     <!--Local Audio Button-->
-    <button class="btn btn-danger"
+    <v-btn color="red darken-2"
         type="button"
         id="btn-local-audio-toggle"
         v-bind:class="{
@@ -49,14 +49,14 @@
         @click="$emit('toggle-audio')">
 
         <span class="sr-only" v-if="!audioEnabled">Enable Audio</span>
-        <i class="fas fa-microphone-slash" v-if="!audioEnabled"></i>
+        <v-icon v-if="!audioEnabled">mdi-microphone-off</v-icon>
 
         <span class="sr-only" v-if="audioEnabled">Mute Video</span>
-        <i class="fas fa-microphone" v-if="audioEnabled"></i>
-    </button>
+        <v-icon v-if="audioEnabled">mdi-microphone</v-icon>
+    </v-btn>
 
     <!--Local Screenshare Button-->
-    <button class="btn btn-success"
+    <v-btn color="green darken-2"
         type="button"
         id="btn-local-screenshare-toggle"
         v-bind:class="{
@@ -67,12 +67,11 @@
         @click="$emit('toggle-screenshare')">
 
         <span class="sr-only" v-if="!screenshareEnabled">Enable Screenshare</span>
-        <i class="fas fa-desktop" v-if="!screenshareEnabled"></i>
-        <i class="fas fa-slash" v-if="!screenshareEnabled"></i>
+        <v-icon v-if="!screenshareEnabled">mdi-monitor-off</v-icon>
 
         <span class="sr-only" v-if="screenshareEnabled">Stop Sharing</span>
-        <i class="fas fa-desktop" v-if="screenshareEnabled"></i>
-    </button>
+        <v-icon v-if="screenshareEnabled">mdi-monitor</v-icon>
+    </v-btn>
 
     <!--Switch Video Feed Button-->
     <button class="btn btn-primary"

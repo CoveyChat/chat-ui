@@ -13,12 +13,6 @@ button.btn {
     margin-top:0.5em;
 }
 
-/**Adjust the slash since font awesome doesn't offer a video slash option */
-#btn-local-screenshare-toggle >>> .fa-slash {
-    display:block;
-    margin-top:-20px;
-}
-
 .btn-off {
     opacity: 0.75;
 }
