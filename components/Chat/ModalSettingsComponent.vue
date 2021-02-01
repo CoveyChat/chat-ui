@@ -53,7 +53,9 @@
 </template>
 
 <style scoped>
-
+    * {
+        color:#000;
+    }
 </style>
 
 <script>

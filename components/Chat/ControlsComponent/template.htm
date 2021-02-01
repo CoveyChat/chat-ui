@@ -3,8 +3,8 @@
         'fullscreen': inFullscreen
     }">
     <!--Settings Button-->
-    <button
-        class="btn btn-secondary"
+    <v-btn
+        color="grey darken-2"
         type="button"
         id="btn-local-video-toggle"
         v-bind:class="{
@@ -14,8 +14,8 @@
         @click="$emit('change-settings')">
 
         <span class="sr-only">Settings</span>
-        <i class="fas fa-cog"></i>
-    </button>
+        <v-icon>mdi-cog-outline</v-icon>
+    </v-btn>
 
 
     <!--Local Video Button-->
@@ -74,7 +74,7 @@
     </v-btn>
 
     <!--Switch Video Feed Button-->
-    <button class="btn btn-primary"
+    <v-btn color="primary"
         type="button"
         id="btn-local-swapvideo-toggle"
         v-bind:class="{
@@ -84,7 +84,7 @@
         @click="$emit('swap-video-feed')">
 
         <span class="sr-only">Switch Video</span>
-        <i class="fas fa-sync-alt"></i>
-    </button>
+        <v-icon>mdi-sync</v-icon>
+    </v-btn>
 
 </div>

@@ -98,6 +98,13 @@ export default {
           click: () => {}
         },
         {
+          icon: 'mdi-comment-plus-outline',
+          title: 'Create Chat',
+          to: '/create-chat',
+          view: {auth: true, default: true},
+          click: () => {}
+        },
+        {
           icon: 'mdi-logout-variant',
           title: 'Logout',
           to: null,

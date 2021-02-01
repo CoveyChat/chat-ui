@@ -1,11 +1,11 @@
 <template>
     <span>
-        <button type="button"
+        <v-btn type="button"
             class="btn btn-link m-0 p-0"
             v-on:click="onClick">
             <span class="sr-only">Copy chat url</span>
-            <i class="far fa-clipboard"></i>
-        </button>
+            <v-icon>mdi-clipboard-text-outline</v-icon>
+        </v-btn>
         <transition appear name="slide-fade">
             <span class="copy-badge badge badge-secondary" v-if="showCopiedBadge" aria-hidden="true">Copied</span>
         </transition>

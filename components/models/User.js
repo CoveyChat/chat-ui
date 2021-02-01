@@ -13,8 +13,6 @@ export default class User {
         self.devices = {video: [], audio: [], active: {video: null, audio: null}};
         self.isMobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent));
         self.preferredBandwidth = (self.isMobile ? 'low' : 'high'); //Low quality for mobile, high for desktop
-
-        console.log("NAME: " + this.name + "~!");
     }
 
     getVideoDevices() {

@@ -333,7 +333,7 @@ export default {
                     var modal = new Modal(self.$refs.modalcontainer, {
                         header: "<h1>Uh oh!</h1>",
                         body: "<p>Could not start your video feed. Did you block the browser permission?</p>" +
-                                "<p>Click the <i class='fas fa-lock'></i><span class='sr-only'>lock</span> icon in the URL to check your permissions and reload this page.</p>"
+                                "<p>Click the <v-icon>mdi-lock</v-icon><span class='sr-only'>lock</span> icon in the URL to check your permissions and reload this page.</p>"
                     });
 
                     console.log("Local Video Stream Error!");

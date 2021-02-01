@@ -18,17 +18,17 @@
 
               <div class="modal-footer">
                 <slot name="footer">
-                  <button
+                  <v-btn
                     v-bind:class="{[closeClass]: closeClass, 'btn btn-md btn-primary': !closeClass}"
                     class="modal-default-button" @click="$emit('close')">
                     {{closeText || 'Close'}}
-                  </button>
+                  </v-btn>
 
-                  <button v-if="confirm"
+                  <v-btn v-if="confirm"
                     v-bind:class="{[confirmClass]: confirmClass, 'btn btn-md btn-primary': !confirmClass}"
                     class="modal-default-button" @click="$emit('confirm')">
                     {{confirmText || 'Confirm'}}
-                  </button>
+                  </v-btn>
                 </slot>
               </div>
             </div>
@@ -39,6 +39,9 @@
 </template>
 
 <style scoped>
+    * {
+        color:#000;
+    }
     .modal-mask {
         position: fixed;
         z-index: 2147483646;
@@ -76,6 +79,10 @@
 
     .modal-body {
         margin: 20px 0;
+    }
+
+    .modal-footer {
+        margin-bottom:4em;
     }
 
     .modal-default-button {

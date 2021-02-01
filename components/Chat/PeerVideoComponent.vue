@@ -4,16 +4,22 @@
             class="peer-video-details"
             v-bind:class="{ 'peer-video-fullscreen': ui.inFullscreen }">
 
-            <i class="fas fa-microphone-slash text-danger" v-if="peer.user.isMuted"></i>
-            <i class="fas fa-microphone" v-if="!peer.user.isMuted"></i>
+            <v-icon color="red darken-2" v-if="peer.user.isMuted">mdi-microphone-off</v-icon>
+            <v-icon v-if="!peer.user.isMuted">mdi-microphone</v-icon>
+            <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-icon v-if="peer.user.verified"
+                    v-bind="attrs"
+                    v-on="on">mdi-lock</v-icon>
+                </template>
+                <span>Verified Account</span>
+            </v-tooltip>
             {{peer.user.name}}
 
             <!--
             #{{peer.stream == null}}#
             #{{peer.hostid}}#-->
             <!--- Id: #{{peer.id}}# - Hst: {{peer.hostid}}# - Cl: {{peer.clientid}}#-->
-
-            <i class="fas fa-lock" v-if="peer.user.verified"></i>
         </div>
         <video :srcObject.prop="peer.stream"
             v-on:click="onDoubleClickCheck"
@@ -40,10 +46,10 @@
     }
 
     .peer-video-details {
-        position: absolute;
+        position: relative;
         z-index: 1;
         display: block;
-        top: 0px;
+        top: 25px;
         left: 0px;
         float: left;
         color: #fff;

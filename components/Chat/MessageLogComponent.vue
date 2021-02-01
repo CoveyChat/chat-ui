@@ -6,9 +6,9 @@
                     :class="{ 'text-right': item.self, 'text-left': !item.self, 'high-contrast': inFullscreen }"
                     v-if="item.index == 0 || (item.index > 0 && (chatLog[$index+1].user.id != item.user.id || chatLog[$index+1].user.name != item.user.name))">
                     {{item.user.name}}
-                    <i class="fas fa-lock" v-if="item.user.verified"></i>
+                    <v-icon v-if="item.user.verified">mdi-lock</v-icon>
                 </p>
-                <v-alert color="teal darken-3" :border="(item.self ? 'right' : 'left')">
+                <v-alert :color="(item.self ? 'teal darken-2' : 'teal darken-4')" :border="(item.self ? 'right' : 'left')">
                     <p class="card p-3 m-1"
                         :class="{ 'text-right alert-info ml-6': item.self, 'mr-6 text-left': !item.self }">
                         {{item.message}}

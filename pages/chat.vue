@@ -18,8 +18,6 @@
 
 export default {
     layout (context) {
-        console.log("Context");
-        console.log(context);
         return 'default'
     },
     data() {
