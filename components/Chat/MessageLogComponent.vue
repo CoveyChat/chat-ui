@@ -60,6 +60,7 @@
 </style>
 
 <script>
+import Message from '../models/Message.js';
 
 export default {
     props: {

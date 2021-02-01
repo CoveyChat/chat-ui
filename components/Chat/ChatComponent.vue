@@ -17,6 +17,7 @@ import ModalSettingsComponent from './ModalSettingsComponent.vue';
 import ControlsComponent from '@/components/Chat/ControlsComponent.vue';
 import NetworkGraphComponent from '@/components/Chat/NetworkGraphComponent.vue';
 import MessageLogComponent from '@/components/Chat/MessageLogComponent.vue';
+import MessageInputComponent from '@/components/Chat/MessageInputComponent.vue';
 import PeerVideoComponent from '@/components/Chat/PeerVideoComponent.vue';
 
 export default {
@@ -24,6 +25,7 @@ export default {
         ControlsComponent,
         NetworkGraphComponent,
         MessageLogComponent,
+        MessageInputComponent,
         PeerVideoComponent
     },
     props: {
@@ -73,7 +75,6 @@ export default {
     },
     data: function () {
         return {
-            message: '',
             chatLog: [],
             connections: {},
             chatId: null,
@@ -365,16 +366,17 @@ export default {
             }
 
         },
-        sendMessage (e) {
+        sendMessage (message) {
             let self = this;
+
             console.log('Called message sender');
-            if(self.message != '' && Object.keys(self.connections).length > 0) {
+            if(message != '' && Object.keys(self.connections).length > 0) {
                 console.log("Sending");
-                console.log(self.message);
-                if(Message.broadcast(self.connections, Message.pack(self.message, 'message'))) {
+                console.log(message);
+                if(Message.broadcast(self.connections, Message.pack(message, 'message'))) {
                     //Write the message we just sent to ourself
-                    self.recieveData(null, self.user.getDataObject(), Message.pack(self.message, 'message'), true);
-                    self.message = '';
+                    self.recieveData(null, self.user.getDataObject(), Message.pack(message, 'message'), true);
+
                 } else {
                     alert("Something went wrong!");
                 }

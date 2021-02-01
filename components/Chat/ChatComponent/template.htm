@@ -143,25 +143,12 @@
         v-bind:showMessagesFullscreen="ui.showMessagesFullscreen">
     </MessageLogComponent>
 
-    <div class="flex-column message-box"
+    <MessageInputComponent
         v-if="user.active"
-        v-bind:class="{
-            'peer-video-fullscreen': (ui.fullscreen.active && ui.showMessagesFullscreen),
-            'chat-disabled': (Object.keys(connections).length == 0)}">
-        <div class="input-group">
-            <v-text-field type="text"
-                v-model="message"
-                id="message-box"
-                :placeholder="(Object.keys(connections).length == 0 ? 'Nobody is here' : 'Type a message')"
-                :disabled="(Object.keys(connections).length == 0)"
-                v-on:keyup.enter="sendMessage"></v-text-field>
-            <div class="input-group-btn">
-                <v-btn color="primary" type="button"  id="send" v-on:click="sendMessage">
-                    <span class="sr-only">Send Message</span>
-                    <v-icon>mdi-send</v-icon>
-                </v-btn>
-            </div>
-        </div>
-    </div>
+        v-on:send="sendMessage"
+        v-bind:inFullscreen="ui.fullscreen.active"
+        v-bind:isActive="(Object.keys(connections).length > 0)"
+        v-bind:showMessagesFullscreen="ui.showMessagesFullscreen">
+    </MessageInputComponent>
 
-    </div>
+</div>
