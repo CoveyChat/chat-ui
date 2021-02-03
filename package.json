@@ -23,7 +23,6 @@
     "sdp-transform": "^2.14.1",
     "simple-peer": "^9.9.3",
     "socket.io": "^2.4.1",
-    "vue-api-query": "^1.9.0",
     "webrtc-adapter": "^7.7.0"
   },
   "devDependencies": {
