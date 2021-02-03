@@ -11,7 +11,6 @@ import PeerConnection from '../models/PeerConnection.js';
 import Modal from '../models/Modal.js';
 import ModalSettingsComponent from './ModalSettingsComponent.vue';
 
-//import ControlsComponent from '~/components/Chat/ControlsComponent.vue';
 //import NetworkGraphComponent from '~/components/Chat/NetworkGraphComponent.vue';
 
 import ControlsComponent from '@/components/Chat/ControlsComponent.vue';
@@ -19,6 +18,7 @@ import NetworkGraphComponent from '@/components/Chat/NetworkGraphComponent.vue';
 import MessageLogComponent from '@/components/Chat/MessageLogComponent.vue';
 import MessageInputComponent from '@/components/Chat/MessageInputComponent.vue';
 import PeerVideoComponent from '@/components/Chat/PeerVideoComponent.vue';
+import ChatUserPrompt from '@/components/Chat/ChatUserPrompt.vue';
 
 export default {
     components: {
@@ -26,7 +26,8 @@ export default {
         NetworkGraphComponent,
         MessageLogComponent,
         MessageInputComponent,
-        PeerVideoComponent
+        PeerVideoComponent,
+        ChatUserPrompt
     },
     props: {
         chatName: String
@@ -264,10 +265,11 @@ export default {
                 e.target.style.left = (window.screen.width - 100) + "px";
             }
         },
-        setAnonUser(e) {
+        setAnonUser(username) {
             let self = this;
-            if(self.ui.anonUsername != '') {
-                self.user.name = self.ui.anonUsername;
+
+            if(username != '') {
+                self.user.name = username;
                 self.user.active = true;
 
                 self.init();

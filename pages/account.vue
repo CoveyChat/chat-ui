@@ -92,6 +92,7 @@
 <script>
 //import Logo from '~/components/Logo.vue'
 //import VuetifyLogo from '~/components/VuetifyLogo.vue'
+import Chat from '~/models/Chat';
 
 export default {
     middleware: 'auth',
@@ -110,15 +111,28 @@ export default {
     },
     methods: {
         async loadChats() {
-            let chats = await this.$axios.$get('/users/' + this.$auth.user.id + '/chats');
-            this.chats = chats.data;
+            //let chats = await this.$axios.$get('/users/' + this.$auth.user.id + '/chats');
+            //this.chats = chats.data;
+console.log("TEST1!!!");
+            let chat = await Chat.find('c4317f43-0829-49c7-a334-5de07e661ce6');
+            console.log("TEST2!!!");
+            console.log(chat.testName);
+            console.log(chat);
+            //chat.save();
+            //console.log("User Model?");
+            //let chat = await Chat.find('c4317f43-0829-49c7-a334-5de07e661ce6');
+            //console.log(chat);
+            //chat.name = "Derp TEst";
+            //chat.patch();
+
             return
         }
     },
     mounted() {
-        console.log(this.$auth.loggedIn);
-        console.log(this.$auth.user);
-        console.log(this.loadChats());
+        //console.log(this.$auth.loggedIn);
+        //console.log(this.$auth.user);
+        //console.log(this.loadChats());
+        this.loadChats()
         this.user = this.$auth.user;
     }
 }

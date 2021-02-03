@@ -7,28 +7,13 @@
             <span class="sr-only">Connection Lost</span>
         </div>
     </div>
-    <div id="user-prompt" v-if="!user.active" name="fade" class="flex-row flex-grow-1">
-        <div class="row">
-            <div class="col-sm-12 offset-md-3 col-md-6 offset-lg-4 col-lg-4 ">
-                <div class="card card-body p-5 text-center">
-                    <h1>{{chatName}}</h1>
-                    <br />
-                    <p>
-                        <input type="text"
-                        class="form-control form-control-xl text-center"
-                        placeholder="Enter your name"
-                        v-model="ui.anonUsername"
-                        v-on:keyup.enter="setAnonUser" />
-                        <transition name="fade">
-                        <v-btn color="primary" class="btn-block mt-3" v-on:click="setAnonUser" v-if="ui.anonUsername.length >= 1">
-                            Start Chatting
-                        </v-btn>
-                        </transition>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+
+    <ChatUserPrompt id="user-prompt"
+        v-if="!user.active"
+        :chatName="chatName"
+        v-on:submit="setAnonUser">
+    </ChatUserPrompt>
+
     <div class="chat-container flex-row flex-fill"
         v-bind:class="{ 'peer-video-fullscreen': ui.fullscreen.active }"
         v-if="user.active">
@@ -36,10 +21,6 @@
             <v-icon>mdi-logout-variant</v-icon>
             <span class="sr-only">Leave Chat</span>
         </v-btn>
-
-
-
-
 
         <ControlsComponent
             v-bind:inFullscreen="ui.fullscreen.active"
@@ -57,9 +38,6 @@
             v-on:change-settings="changeSettings"
         >
         </ControlsComponent>
-
-
-
 
 
 
