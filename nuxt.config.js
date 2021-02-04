@@ -55,7 +55,7 @@ export default {
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
-      '~plugins/api-model'
+      '~plugins/vue-api-query'
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
