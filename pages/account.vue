@@ -115,7 +115,7 @@ export default {
             //let chats = await this.$axios.$get('/users/' + this.$auth.user.id + '/chats');
             //this.chats = chats.data;
 
-            let chats = await (new User({id:1})).chats().get();
+            let chats = await (new User({id:this.$auth.user.id})).chats().get();
             this.chats = chats.data;
 
             return
