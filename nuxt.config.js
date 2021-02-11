@@ -16,19 +16,19 @@ export default {
     },
     strategies: {
         local: {
-            token: {
-              property: 'data.token',
+            /*token: {
+              property: 'token',
               required: true,
               type: 'Bearer'
             },
             user: {
-              property: 'data.user',
+              property: 'user',
               autoFetch: true
-            },
+            },*/
             endpoints: {
               login: { url: 'users/login', method: 'post' },
               logout: { url: 'users/logout', method: 'post' },
-              user: { url: 'users/whoami', method: 'get' }
+              user: { url: 'users/whoami', method: 'get', propertyName: 'user' }
             }
           }
     }

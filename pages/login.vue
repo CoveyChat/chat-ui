@@ -57,12 +57,13 @@ export default {
             try {
                 let response = await this.$auth.login({ data: {auth: {email: email, password: password}} });
 
+                console.log("TEST");
                 console.log(response);
                 //console.log(response)
                 //this.$auth.setUser(response.data);
-                //console.log(this.$auth);
-                //console.log(this.$auth.loggedIn);
-                //console.log(this.$auth.user);
+                console.log(this.$auth);
+                console.log(this.$auth.loggedIn);
+                console.log(this.$auth.user);
                 //console.log(this.$store);
                 //this.$toast.success('Logged In!');
                 //console.log(this.$store);
