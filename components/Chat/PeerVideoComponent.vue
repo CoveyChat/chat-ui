@@ -81,7 +81,7 @@
 </style>
 
 <script>
-import PeerConnection from '../models/PeerConnection.js';
+import PeerConnection from '../shared/PeerConnection.js';
 
 export default {
     name: "PeerVideoComponent",

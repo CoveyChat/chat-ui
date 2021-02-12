@@ -4,11 +4,11 @@
 <script>
 
 import Draggable from '../directives/Draggable.js';
-import SoundEffect from '../models/SoundEffect.js';
-import User from '../models/User.js';
-import Message from '../models/Message.js';
-import PeerConnection from '../models/PeerConnection.js';
-import Modal from '../models/Modal.js';
+import SoundEffect from '../shared/SoundEffect.js';
+import User from '../shared/User.js';
+import Message from '../shared/Message.js';
+import PeerConnection from '../shared/PeerConnection.js';
+import Modal from '../shared/Modal.js';
 import ModalSettingsComponent from './ModalSettingsComponent.vue';
 
 //import NetworkGraphComponent from '~/components/Chat/NetworkGraphComponent.vue';

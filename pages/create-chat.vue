@@ -93,8 +93,8 @@
 </style>
 
 <script>
-//import Logo from '~/components/Logo.vue'
-//import VuetifyLogo from '~/components/VuetifyLogo.vue'
+import User from '~/models/User';
+import Chat from '~/models/Chat';
 
 export default {
     layout (context) {
@@ -122,31 +122,39 @@ export default {
             }
         },
         async create(name, password) {
-            console.log(name);
-            console.log(password);
+            let user = null;
+            let chat = null;
 
-            let params = {
-                chat: {
-                    name: name,
-                }
-            };
+            if(this.$auth.user) {
+                user = (new User({id:this.$auth.user.id}));
+                chat = new Chat().for(user);
+            } else {
+                chat = new Chat();
 
-            if(password) {
-                params.chat.password = password;
             }
 
-            let chat = await this.$axios.$post('/users/' + this.$auth.user.id + '/chats', params);
-            console.log(chat.data.chat);
+            chat.name = name;
+            chat.password = password;
+            chat = await chat.save();
 
-            if(chat.success) {
+            console.log(chat);
+
+
+            if(chat) {
                 this.$toast.success('Successfully Created!');
             } else {
                 this.$toast.error('Could not create!');
             }
 
-            this.$router.push({
-                path: '/account'
-            });
+            if(this.$auth.user) {
+                this.$router.push({
+                    path: '/account'
+                });
+            } else {
+                this.$router.push({
+                    path: '/chat/?id=' + chat.id
+                });
+            }
         }
     },
     components: {

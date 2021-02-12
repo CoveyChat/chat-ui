@@ -92,7 +92,6 @@
 <script>
 //import Logo from '~/components/Logo.vue'
 //import VuetifyLogo from '~/components/VuetifyLogo.vue'
-import Chat from '~/models/Chat';
 import User from '~/models/User';
 
 export default {

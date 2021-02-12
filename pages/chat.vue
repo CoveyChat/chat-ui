@@ -15,6 +15,7 @@
 <script>
 //import Logo from '~/components/Logo.vue'
 //import VuetifyLogo from '~/components/VuetifyLogo.vue'
+import Chat from '~/models/Chat';
 
 export default {
     layout (context) {
@@ -32,8 +33,8 @@ export default {
     },
     methods: {
         async loadChat(chatId) {
-            let chat = await this.$axios.$get('/chats/' + chatId);
-            this.chat = chat.data.chat;
+            let chat = await Chat.find(chatId);
+            this.chat = chat;
             return
         }
     },
