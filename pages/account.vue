@@ -13,15 +13,15 @@
                 <h1>My Chats</h1>
 
                 <v-list-item three-line
-                    v-for="(item, i) in chats"
+                    v-for="(chat, i) in chats"
                     :key="i">
                     <v-list-item-content>
-                        <v-list-item-title>{{ item.chat.name }}</v-list-item-title>
+                        <v-list-item-title>{{ chat.name }}</v-list-item-title>
                         <v-list-item-subtitle>
-                        Created at {{ item.chat.created_at }}
+                        Created at {{ chat.created_at }}
                         </v-list-item-subtitle>
                         <v-list-item-subtitle>
-                            <a :href="'/chat/?id=' + item.chat.id">https://bevy.chat/chat/{{ item.chat.id }}</a>
+                            <a :href="'/chat/?id=' + chat.id">https://bevy.chat/chat/{{ chat.id }}</a>
                         </v-list-item-subtitle>
                     </v-list-item-content>
                 </v-list-item>
@@ -116,7 +116,13 @@ export default {
             //this.chats = chats.data;
 
             let chats = await (new User({id:this.$auth.user.id})).chats().get();
-            this.chats = chats.data;
+            //console.log(chats);
+            this.chats = chats;
+
+            //chats[0].name = "My Neat Super Duper Awesome Chat";
+            //chats[0].description = "Woot";
+            //chats[0].save();
+            //chats[0].delete();
 
             return
         }
