@@ -96,7 +96,7 @@ export default {
     methods: {
         changeSettings(e) {
             let self = this;
-            var options = {
+            let options = {
                 props: {
                     close: {text: "Save and close"},
                     userPreferredBandwidth: self.user.preferredBandwidth,
@@ -104,10 +104,10 @@ export default {
                 }
             };
 
-            var modal = new Modal(self.$refs.modalcontainer, options, ModalSettingsComponent);
+            let modal = new Modal(self.$refs.modalcontainer, options, ModalSettingsComponent);
 
             //Store the old settings to check against because vue binding already applied them
-            var oldSettings = {
+            let oldSettings = {
                 video: self.user.devices.active.video,
                 audio: self.user.devices.active.audio
             };
@@ -137,7 +137,7 @@ export default {
                 self.user.preferredBandwidth = preferred.bandwidth;
 
                 //Update the preferred bandwidth on all it's peers
-                for(var id in self.connections) {
+                for(let id in self.connections) {
                     //If we're streaming to them then kill it
                     self.connections[id].setPreferredBandwidth(preferred.bandwidth);
 

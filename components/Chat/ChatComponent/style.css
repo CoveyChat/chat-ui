@@ -33,15 +33,7 @@
 .chat-disabled >>> button {
     opacity:.5;
 }
-.btn-leave-chat {
-    position: absolute;
-    width: 25%;
-    bottom: 0px;
-    left: 50%;
-    margin-top: 6px;
-    margin-left: -12.5%;
-    background:#f00;
-}
+
 .video-connections {
     background: #eee;
     min-height: 20vh;

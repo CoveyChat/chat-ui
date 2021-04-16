@@ -20,12 +20,14 @@
                 <slot name="footer">
                   <v-btn
                     v-bind:class="{[closeClass]: closeClass, 'btn btn-md btn-primary': !closeClass}"
+                    :color="closeColor || 'error'"
                     class="modal-default-button" @click="$emit('close')">
                     {{closeText || 'Close'}}
                   </v-btn>
 
                   <v-btn v-if="confirm"
                     v-bind:class="{[confirmClass]: confirmClass, 'btn btn-md btn-primary': !confirmClass}"
+                    :color="confirmColor || 'primary'"
                     class="modal-default-button" @click="$emit('confirm')">
                     {{confirmText || 'Confirm'}}
                   </v-btn>
@@ -39,9 +41,6 @@
 </template>
 
 <style scoped>
-    * {
-        color:#000;
-    }
     .modal-mask {
         position: fixed;
         z-index: 2147483646;
@@ -125,7 +124,9 @@ export default {
     data: function () {
         return {
             closeClass: null,
+            closeColor: null,
             confirmClass: null,
+            confirmColor: null,
             closeText: null,
             confirmText: null
         }
@@ -151,6 +152,14 @@ export default {
 
         if(typeof self.confirm != 'undefined' && self.confirm.text) {
             self.confirmText = self.confirm.text;
+        }
+
+        if(typeof self.close != 'undefined' && self.close.color) {
+            self.closeColor = self.close.color;
+        }
+
+        if(typeof self.confirm != 'undefined' && self.confirm.color) {
+            self.confirmColor = self.confirm.color;
         }
     },
     mounted() {

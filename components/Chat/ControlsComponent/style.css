@@ -5,7 +5,7 @@
     bottom:0px;
     top:0px;
     width:5em;
-    background: #333;
+    background: #303030;
 }
 
 button.v-btn {
@@ -17,6 +17,15 @@ button.v-btn {
 
 .btn-off {
     opacity: 0.75;
+}
+
+.btn-leave-chat {
+    position: absolute;
+    bottom: 1em;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /*
