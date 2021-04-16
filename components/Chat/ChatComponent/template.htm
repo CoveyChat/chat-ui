@@ -86,7 +86,12 @@
                     }"
                     class="col-ml-auto embed-responsive embed-responsive-4by3">
                     <div v-if="peer.stream == null" class="peer-user-no-stream">
-                        <div class="peer-user-no-stream-name">{{peer.user.name}}</div>
+                        <div class="peer-user-no-stream-name">{{peer.user.name}}</div><br />
+                        <div>
+                            <v-icon color="red darken-2">mdi-microphone-off</v-icon>
+                            <v-icon color="red darken-2">mdi-video-off</v-icon>
+
+                        </div>
                     </div>
                     <PeerVideoComponent
                         ref="peerVideos"
