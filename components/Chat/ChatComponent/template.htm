@@ -17,10 +17,6 @@
     <div class="chat-container flex-row flex-fill"
         v-bind:class="{ 'peer-video-fullscreen': ui.fullscreen.active }"
         v-if="user.active">
-        <v-btn color="red darken-2" class="btn-leave-chat btn " v-on:click="confirmLeave">
-            <v-icon>mdi-logout-variant</v-icon>
-            <span class="sr-only">Leave Chat</span>
-        </v-btn>
 
         <ControlsComponent
             v-bind:inFullscreen="ui.fullscreen.active"
@@ -31,11 +27,13 @@
             v-bind:screenshareEnabled="stream.screenshareenabled"
             v-bind:videoDevices="user.devices.video"
 
+            v-on:close-chat="confirmLeave"
             v-on:toggle-video="toggleVideo"
             v-on:toggle-audio="toggleAudio"
             v-on:toggle-screenshare="toggleScreenshare"
             v-on:swap-video-feed="swapVideoFeed"
             v-on:change-settings="changeSettings"
+            v-on:toggle-chat-drawer="ui.chatDrawer = !ui.chatDrawer"
         >
         </ControlsComponent>
 
@@ -120,18 +118,28 @@
         </v-btn>
     </div>
 
-    <MessageLogComponent
-        v-bind:chatLog="chatLog" v-if="user.active"
-        v-bind:inFullscreen="ui.fullscreen.active"
-        v-bind:showMessagesFullscreen="ui.showMessagesFullscreen">
-    </MessageLogComponent>
+    <div class="chat-drawer-container">
+    <v-navigation-drawer
+      v-model="ui.chatDrawer"
+      absolute
+      right
+      temporary
+        >
+        <MessageLogComponent
+            v-bind:chatLog="chatLog" v-if="user.active"
+            v-bind:inFullscreen="ui.fullscreen.active"
+            v-bind:showMessagesFullscreen="ui.showMessagesFullscreen">
+        </MessageLogComponent>
 
-    <MessageInputComponent
-        v-if="user.active"
-        v-on:send="sendMessage"
-        v-bind:inFullscreen="ui.fullscreen.active"
-        v-bind:isActive="(Object.keys(connections).length > 0)"
-        v-bind:showMessagesFullscreen="ui.showMessagesFullscreen">
-    </MessageInputComponent>
+        <MessageInputComponent
+            v-if="user.active"
+            v-on:send="sendMessage"
+            v-bind:inFullscreen="ui.fullscreen.active"
+            v-bind:isActive="(Object.keys(connections).length > 0)"
+            v-bind:showMessagesFullscreen="ui.showMessagesFullscreen">
+        </MessageInputComponent>
+    </v-navigation-drawer>
+
+    </div>
 
 </div>

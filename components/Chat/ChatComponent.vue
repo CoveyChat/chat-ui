@@ -83,6 +83,7 @@ export default {
             stream: {videoenabled: false, audioenabled:true, screenshareenabled: false, connection: null, local:null, localsize:'md', volume:0},
             server: {ip:'devbevy.chat', port:1337, signal: null},
             ui: {
+                chatDrawer: null,
                 deviceAccess: true,
                 anonUsername: '',
                 fullscreen: {active: false, target:null, wait:false},

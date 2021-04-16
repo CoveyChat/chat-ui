@@ -31,19 +31,19 @@
 
     @media screen and (max-height: 400px) {
         #messages {
-            max-height:50vh;
+            max-height:78vh;
         }
     }
 
     @media screen and (min-height: 401px) and (max-height: 799px) {
         #messages {
-            max-height:40vh;
+            max-height:78vh;
         }
     }
 
     @media screen and (min-height: 800px) {
         #messages {
-            max-height:30vh;
+            max-height:78vh;
         }
     }
 

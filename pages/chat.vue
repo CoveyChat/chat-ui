@@ -17,7 +17,7 @@ import Chat from '~/models/Chat';
 
 export default {
     layout (context) {
-        return 'default'
+        return 'chat'
     },
     data() {
         return {

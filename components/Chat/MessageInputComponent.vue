@@ -30,7 +30,7 @@
 
 <style scope>
     #message-box {
-        max-height: 10em;
+        max-height: 12vh;
         overflow: auto;
     }
 </style>

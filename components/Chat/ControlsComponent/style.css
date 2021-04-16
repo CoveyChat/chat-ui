@@ -2,11 +2,13 @@
     position: fixed;
     z-index:2147483630 !important;
     right:0px;
-    width:4em;
+    bottom:0px;
+    top:0px;
+    width:5em;
+    background: #333;
 }
 
-button.btn {
-    right:10px;
+button.v-btn {
     border-radius: 2em !important;
     width: 4em;
     height: 4em;

@@ -36,7 +36,7 @@
 .btn-leave-chat {
     position: absolute;
     width: 25%;
-    top: 0px;
+    bottom: 0px;
     left: 50%;
     margin-top: 6px;
     margin-left: -12.5%;
@@ -177,4 +177,12 @@ video.peer-video-fullscreen {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
+}
+
+.chat-drawer-container {
+    position: relative;
+}
+.chat-drawer-container > .v-navigation-drawer{
+    position: fixed;
+    right:5em;
 }
