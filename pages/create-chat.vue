@@ -125,12 +125,12 @@ export default {
             let user = null;
             let chat = null;
 
+            // If you're authenticated then create the chat under the current user. Otherwise anon chat
             if(this.$auth.user) {
                 user = (new User({id:this.$auth.user.id}));
                 chat = new Chat().for(user);
             } else {
                 chat = new Chat();
-
             }
 
             chat.name = name;
