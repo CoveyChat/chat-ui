@@ -8,6 +8,7 @@
             <v-textarea type="text"
                 v-model="message"
                 id="message-box"
+                class="pl-2"
                 :placeholder="(!isActive ? 'Nobody is here' : 'Type a message')"
                 :disabled="!isActive"
                 rows="1"

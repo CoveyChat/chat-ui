@@ -1,5 +1,5 @@
 <template>
-    <div id="messages" ref="messages" class="overflow-auto d-flex flex-grow-1 flex-column flex-column-reverse "
+    <div id="messages" ref="messages" class="overflow-y-auto pl-2 pr-2"
         :class="{ 'peer-video-fullscreen': (inFullscreen && showMessagesFullscreen) }">
             <div v-for="(item, $index) in chatLog" :key="item.index">
                 <p class="text-muted p-0 mb-0"
@@ -27,25 +27,18 @@
         Very important for mobile since videos "stack" and will otherwise collapse the messages
         area down to nothing */
         -webkit-mask-image: linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+        max-height:78vh;
+        overflow-x: hidden;
+    }
+    #messages::-webkit-scrollbar {
+        width: 10px;
+        background:#333;
+    }
+    #messages::-webkit-scrollbar-thumb {
+        width: 50px;
+        background:#ccc;
     }
 
-    @media screen and (max-height: 400px) {
-        #messages {
-            max-height:78vh;
-        }
-    }
-
-    @media screen and (min-height: 401px) and (max-height: 799px) {
-        #messages {
-            max-height:78vh;
-        }
-    }
-
-    @media screen and (min-height: 800px) {
-        #messages {
-            max-height:78vh;
-        }
-    }
 
     #messages.peer-video-fullscreen {
         z-index:2147483622;
