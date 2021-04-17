@@ -4,7 +4,7 @@
             <div v-for="(item, $index) in chatLog" :key="item.index">
                 <p class="text-muted p-0 mb-0"
                     :class="{ 'text-right': item.self, 'text-left': !item.self, 'high-contrast': inFullscreen }"
-                    v-if="item.index == 0 || (item.index > 0 && (chatLog[$index+1].user.id != item.user.id || chatLog[$index+1].user.name != item.user.name))">
+                    v-if="item.index == 0 || (item.index > 0 && (chatLog[$index-1].user.id != item.user.id || chatLog[$index-1].user.name != item.user.name))">
                     {{item.user.name}}
                     <v-icon v-if="item.user.verified">mdi-lock</v-icon>
                 </p>

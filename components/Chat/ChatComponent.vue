@@ -392,7 +392,7 @@ export default {
             if(data.type == 'message') {
                 self.ui.sound.play('message');
                 //Add the elements in reverse so that the log trickles from the bottom up
-                self.chatLog.unshift({index: self.chatLog.length, message: data.data, user: user, self: writeSelf});
+                self.chatLog.push({index: self.chatLog.length, message: data.data, user: user, self: writeSelf});
             } else if (data.type == 'event' && id !== null) {
                 console.log("Recieved event ");
 
