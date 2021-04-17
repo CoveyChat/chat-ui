@@ -1,24 +1,30 @@
 <template>
     <div id="messages" ref="messages" class="overflow-y-auto pl-2 pr-2"
         :class="{ 'peer-video-fullscreen': (inFullscreen && showMessagesFullscreen) }">
-            <div v-for="(item, $index) in chatLog" :key="item.index">
+            <div v-for="(item, $index) in messages" :key="item.index">
                 <p class="text-muted p-0 mb-0"
                     :class="{ 'text-right': item.self, 'text-left': !item.self, 'high-contrast': inFullscreen }"
                     v-if="item.index == 0 || (item.index > 0 && (chatLog[$index-1].user.id != item.user.id || chatLog[$index-1].user.name != item.user.name))">
                     {{item.user.name}}
                     <v-icon v-if="item.user.verified">mdi-lock</v-icon>
                 </p>
-                <v-alert :color="(item.self ? 'teal darken-2' : 'teal darken-4')" :border="(item.self ? 'right' : 'left')">
-                    <p class="card p-3 m-1"
+                <v-alert :color="(item.self ? 'grey darken-3' : 'grey darken-4')" :border="(item.self ? 'right' : 'left')">
+                    <div class="card p-3 m-1"
                         :class="{ 'text-right alert-info ml-6': item.self, 'mr-6 text-left': !item.self }">
-                        {{item.message}}
-                    </p>
+                        <vue-markdown :source="item.message" class="message" />
+                    </div>
                 </v-alert>
             </div>
             <div class="p-3"><!--Empty div so the fade is pushed down a little --></div>
         </div>
     </div>
 </template>
+
+<style>
+    .message > p {
+        margin-bottom: 0px !important;
+    }
+</style>
 
 <style scoped>
     #messages {
@@ -54,12 +60,33 @@
 
 <script>
 import Message from '../shared/Message.js';
+import VueMarkdown from 'vue-markdown-render'
 
 export default {
+    components: {
+        VueMarkdown
+    },
     props: {
         chatLog: Array,
         inFullscreen: Boolean,
         showMessagesFullscreen: Boolean
+    },
+    computed: {
+        messages: function() {
+            let messages = [];
+
+            ([...this.chatLog]).forEach(data => {
+                // Strip any trailing new lines
+                data.message = data.message.replace(/[\r\n]$/, '');
+
+                // Replace newline characters with double-space markdown newlines
+                data.message = data.message.replaceAll('\n', '  \n');
+                messages.push(data);
+
+            });
+
+            return messages;
+        }
     },
     data: function () {
         return {

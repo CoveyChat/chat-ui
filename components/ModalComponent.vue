@@ -41,6 +41,9 @@
 </template>
 
 <style scoped>
+    .modal-header, .modal-body {
+        color:#333;
+    }
     .modal-mask {
         position: fixed;
         z-index: 2147483646;

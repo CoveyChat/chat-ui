@@ -98,7 +98,7 @@ export default {
             let self = this;
             let options = {
                 props: {
-                    close: {text: "Save and close"},
+                    close: {text: "Save and close", color: "primary"},
                     userPreferredBandwidth: self.user.preferredBandwidth,
                     userDevices: self.user.devices //Use a cloned value so we don't pre-emptively update stuff
                 }
@@ -152,10 +152,10 @@ export default {
 
             var options = {
                 props: {
-                    close: {text: "Go back"},
+                    close: {text: "Go back", color: "primary"},
                     confirm: {
                         text: "Leave",
-                        class: "btn btn-danger"
+                        color: "error"
                     }
                 },
                 header: "<h1>Confirm Leave</h1>",
@@ -337,7 +337,7 @@ export default {
                     var modal = new Modal(self.$refs.modalcontainer, {
                         header: "<h1>Uh oh!</h1>",
                         body: "<p>Could not start your video feed. Did you block the browser permission?</p>" +
-                                "<p>Click the <v-icon>mdi-lock</v-icon><span class='sr-only'>lock</span> icon in the URL to check your permissions and reload this page.</p>"
+                                "<p>Click the lock icon in the URL to check your permissions and reload this page.</p>"
                     });
 
                     console.log("Local Video Stream Error!");
