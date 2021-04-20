@@ -45,6 +45,10 @@
         background:#000;
     }
 
+    .peer-stream-container > video {
+        width: 100%;
+    }
+
     .peer-video-details {
         position: relative;
         z-index: 1;
@@ -65,13 +69,16 @@
       */
     .peer-video-details.peer-video-fullscreen {
         position:fixed;
-        z-index:3;
+        z-index:6;
     }
 
     video.peer-video-fullscreen {
         position:fixed !important;
+        top:0;
+        left:0;
         background: #000;
-        z-index: 2;
+        z-index: 5;
+        height: 100%;
     }
 
     .peer-is-speaking {
