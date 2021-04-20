@@ -69,7 +69,7 @@
       */
     .peer-video-details.peer-video-fullscreen {
         position:fixed;
-        z-index:6;
+        z-index:7;
     }
 
     video.peer-video-fullscreen {
@@ -77,7 +77,7 @@
         top:0;
         left:0;
         background: #000;
-        z-index: 5;
+        z-index: 6;
         height: 100%;
     }
 
