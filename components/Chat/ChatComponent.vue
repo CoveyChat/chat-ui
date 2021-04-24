@@ -7,6 +7,7 @@ import Draggable from '../directives/Draggable.js';
 import SoundEffect from '../shared/SoundEffect.js';
 import User from '../shared/User.js';
 import Message from '../shared/Message.js';
+import Connections from '../shared/Connections.js';
 import PeerConnection from '../shared/PeerConnection.js';
 import Modal from '../shared/Modal.js';
 import ModalSettingsComponent from './ModalSettingsComponent.vue';
@@ -33,12 +34,15 @@ export default {
         chatName: String
     },
     computed: {
+        connections: function() {
+            return Connections.getConnections();
+        },
         peerStreams: function() {
             let self = this;
 
             //Only return peer connections that have a stream object
-            return Object.keys(self.connections)
-                .map(key => self.connections[key]) // turn an array of keys into array of items.
+            return Object.keys(Connections.getConnections())
+                .map(key => Connections.getConnections()[key]) // turn an array of keys into array of items.
                 .filter(peer =>  peer.stream != null); // filter that array,
         },
         currentVolume() {
@@ -77,11 +81,9 @@ export default {
     data: function () {
         return {
             chatLog: [],
-            connections: {},
             chatId: null,
             user: {active: false},
             stream: {videoenabled: false, audioenabled:true, screenshareenabled: false, connection: null, local:null, localsize:'md', volume:0},
-            server: {ip:'devbevy.chat', port:1337, signal: null},
             ui: {
                 chatDrawer: null,
                 deviceAccess: true,
@@ -137,12 +139,12 @@ export default {
                 self.user.preferredBandwidth = preferred.bandwidth;
 
                 //Update the preferred bandwidth on all it's peers
-                for(let id in self.connections) {
+                for(let id in Connections.getConnections()) {
                     //If we're streaming to them then kill it
-                    self.connections[id].setPreferredBandwidth(preferred.bandwidth);
+                    Connections.getConnections()[id].setPreferredBandwidth(preferred.bandwidth);
 
                     //renegotiate the connection for the new quality
-                    self.connections[id].connection.negotiate();
+                    Connections.getConnections()[id].connection.negotiate();
                 }
 
             });
@@ -166,10 +168,10 @@ export default {
 
             modal.$on('confirm', function(e) {
                 //Let everyone know I'm leaving so they don't sit then hanging
-                for(var id in self.connections) {
+                for(var id in Connections.getConnections()) {
                     //If we're streaming to them then kill it
-                    self.connections[id].removeStream(self.stream.connection);
-                    self.connections[id].destroy();
+                    Connections.getConnections()[id].removeStream(self.stream.connection);
+                    Connections.getConnections()[id].destroy();
                 }
                 //Go back to the homepage
                 window.location.href = '/';
@@ -282,12 +284,12 @@ export default {
                 self.stream.audioenabled = false;
                 self.setLocalAudio(self.stream.connection, false);
 
-                Message.broadcast(self.connections, Message.pack({muted:true}, 'event'));
+                Message.broadcast(Connections.getConnections(), Message.pack({muted:true}, 'event'));
             } else if((self.stream.videoenabled || self.stream.screenshareenabled) && !self.stream.audioenabled) {
                 self.stream.audioenabled = true;
                 self.setLocalAudio(self.stream.connection, true);
 
-                Message.broadcast(self.connections, Message.pack({muted:false}, 'event'));
+                Message.broadcast(Connections.getConnections(), Message.pack({muted:false}, 'event'));
             }
         },
         setLocalAudio(stream, enabled) {
@@ -370,44 +372,10 @@ export default {
 
         },
         sendMessage (message) {
-            let self = this;
-
-            console.log('Called message sender');
-            if(message != '' && Object.keys(self.connections).length > 0) {
-                console.log("Sending");
-                console.log(message);
-                if(Message.broadcast(self.connections, Message.pack(message, 'message'))) {
-                    //Write the message we just sent to ourself
-                    self.recieveData(null, self.user.getDataObject(), Message.pack(message, 'message'), true);
-
-                } else {
-                    alert("Something went wrong!");
-                }
-            }
+            Connections.sendMessage(message);
         },
-        recieveData(id, user, data, writeSelf = false) {
-            let self = this;
-            data = Message.unpack(data);
 
-            if(data.type == 'message') {
-                self.ui.sound.play('message');
-                //Add the elements in reverse so that the log trickles from the bottom up
-                self.chatLog.push({index: self.chatLog.length, message: data.data, user: user, self: writeSelf});
-            } else if (data.type == 'event' && id !== null) {
-                console.log("Recieved event ");
-
-                if(data.data && typeof data.data.muted != 'undefined') {
-                    self.connections[id].user.isMuted = data.data.muted;
-
-                    /*console.log(data);
-                    console.log(data.data);
-                    console.log(user);
-                    console.log(self.connections[id].user);*/
-                }
-
-            }
-        },
-        outputConnections () {
+        /*outputConnections () {
             let self = this;
 
             //Update for anything that's binding to Object.keys
@@ -416,8 +384,8 @@ export default {
             var networkChartData = {nodes:[{id: 'me', name: 'Me'}], links:[]};
 
 
-            for(var id in self.connections) {
-                var peer = self.connections[id];
+            for(var id in Connections.getConnections()) {
+                var peer = Connections.getConnections()[id];
                 var name = typeof peer.user != 'undefined' ? peer.user.name : 'X';
 
                 //This is the host connection and it's actually bound to someone
@@ -443,7 +411,7 @@ export default {
             //console.log(networkChartData);
             //self.$refs.networkGraph.update(networkChartData);
 
-        },
+        },*/
         /**
          * When a peer opens a stream, show the new connection
          */
@@ -453,20 +421,20 @@ export default {
             /*console.log("On peer stream called @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             console.log(stream);
             console.log(peerid);
-            console.log(self.connections);*/
+            console.log(Connections.getConnections());*/
 
             /*
             Check for duplicates across all peers incase buttons are spammed
             Sometimes a second connection will still be waiting to close and we don't want to
             renegotiate otherwise the connection will be re-established and not close
             */
-            for(var id in self.connections) {
+            for(var id in Connections.getConnections()) {
                 //Duplicate stream! Ignore it
-                if(self.connections[id].stream != null && self.connections[id].stream.id == stream.id) {
+                if(Connections.getConnections()[id].stream != null && Connections.getConnections()[id].stream.id == stream.id) {
                     //This stream already existed on this id
                     //Seems we have 2 connections open. Destroy the duplicate!
-                    self.connections[id].destroy();
-                    self.outputConnections();
+                    Connections.getConnections()[id].destroy();
+                    //self.outputConnections();
                 }
             }
 
@@ -475,25 +443,25 @@ export default {
             if(self.ui.fullscreen.target == peerid) {
                 //console.log("Rebind!");
                 //We found our stream so we don't want to rebind anymore
-                self.connections[peerid].startFullscreen = true;
+                Connections.getConnections()[peerid].startFullscreen = true;
 
             } else {
                 //console.log("Don't bind!");
-                self.connections[peerid].startFullscreen = false;
+                Connections.getConnections()[peerid].startFullscreen = false;
             }
             //console.log("--------------------------------------------");
             //console.log("Set stream for peer " + peerid);
-            self.connections[peerid].setStream(stream);
+            Connections.getConnections()[peerid].setStream(stream);
 
-            //self.$set(self.connections[peerid], 'stream', stream);
+            //self.$set(Connections.getConnections()[peerid], 'stream', stream);
 
             /**
              * Fires twice. Once when the audio is removed and once when the video is removed
              */
             stream.onremovetrack = function(e) {
                 console.log("on remove track");
-                self.connections[peerid].clearPeerStream();
-                //self.$set(self.connections[peerid], 'stream', null);
+                Connections.getConnections()[peerid].clearPeerStream();
+                //self.$set(Connections.getConnections()[peerid], 'stream', null);
 
                 //Make sure we close fullscreen if necessary
                 if(self.ui.fullscreen.active) {
@@ -594,21 +562,21 @@ export default {
             self.bindVolume(self.stream.connection);
 
             //New Local stream! Send it off  to all the peers
-            for(var id in self.connections) {
-                if(self.connections[id].connection == null
-                    || !self.connections[id].connection.connected
-                    || self.connections[id].connection.destroyed) {
+            for(var id in Connections.getConnections()) {
+                if(Connections.getConnections()[id].connection == null
+                    || !Connections.getConnections()[id].connection.connected
+                    || Connections.getConnections()[id].connection.destroyed) {
                     //console.log("Don't send stream. Skip bad connection " + id);
-                    //console.log(self.connections[id]);
+                    //console.log(Connections.getConnections()[id]);
                     continue;
                 }
 
                 //has old tracks. Replace instead of add
                 if(replace) {
                     //Replace the stream in the peer connection
-                    self.connections[id].replaceStream(self.stream.connection, stream);
+                    Connections.getConnections()[id].replaceStream(self.stream.connection, stream);
                 } else {
-                    self.connections[id].addStream(self.stream.connection);
+                    Connections.getConnections()[id].addStream(self.stream.connection);
                 }
             }
 
@@ -626,21 +594,21 @@ export default {
         sendStream(id) {
             let self = this;
 
-            if(typeof self.connections[id] == 'undefined'
-                || self.connections[id].connection == null
-                || !self.connections[id].connection.connected
-                || self.connections[id].connection.destroyed) {
+            if(typeof Connections.getConnections()[id] == 'undefined'
+                || Connections.getConnections()[id].connection == null
+                || !Connections.getConnections()[id].connection.connected
+                || Connections.getConnections()[id].connection.destroyed) {
                 console.log("Cannot send stream! BAD CONNECTION TO " + id);
-                console.log(self.connections[id]);
+                console.log(Connections.getConnections()[id]);
                 return false;
             }
 
-            if((self.stream.videoenabled  || self.stream.screenshareenabled) && !self.connections[id].isStreaming) {
+            if((self.stream.videoenabled  || self.stream.screenshareenabled) && !Connections.getConnections()[id].isStreaming) {
                 //console.log("+APPLYING STREAM");
-                self.connections[id].addStream(self.stream.connection);
+                Connections.getConnections()[id].addStream(self.stream.connection);
 
                 //Let them know the state of the microphone
-                self.connections[id].send(Message.pack({muted:!self.stream.audioenabled}, 'event'));
+                Connections.getConnections()[id].send(Message.pack({muted:!self.stream.audioenabled}, 'event'));
             }
 
         },
@@ -650,11 +618,11 @@ export default {
             if(!self.stream.videoenabled && !self.stream.screenshareenabled) {return}
 
             //Remove this stream to all the peers so they don't need to do the timeout removal
-            for(var id in self.connections) {
-                if(!self.connections[id].isStreaming) {
+            for(var id in Connections.getConnections()) {
+                if(!Connections.getConnections()[id].isStreaming) {
                     continue;
                 }
-                self.connections[id].removeStream(self.stream.connection);
+                Connections.getConnections()[id].removeStream(self.stream.connection);
             }
 
             //Also remove it from the UI / Kill the feed
@@ -666,143 +634,19 @@ export default {
 
             self.stream.connection = null;
         },
-        handlePeerDisconnect(id) {
-            let self = this;
-            self.ui.sound.play('disconnect');
-
-            //Set the value to null so vue can compute it before we delete it
-            self.connections[id] = null;
-
-            delete self.connections[id];
-            self.outputConnections();
-        },
         init() {
             let self = this;
 
-            var Peer = require('simple-peer');
-            var io = require('socket.io-client');
-
-
             self.chatId = location.pathname.replace('/chat/', '');
-            self.server.signal = io.connect('https://' + self.server.ip + ':' + self.server.port);
 
-            //var txtLogger = document.getElementById('logger');
+            Connections.connect(self.chatId, self.user);
 
-            self.server.signal.on('disconnect', function () {
-                alert("Uh oh! You disconnected!");
-                self.connections = [];
-            });
-
-            self.server.signal.on('connect', function () {
-                console.log("Connected to signal server. Sending auth...");
-                //Pass to the server that we want to join this chat room with this user
-                //It will use the user to annouce to other connections who you are
-                self.server.signal.emit('join', {chatId: self.chatId, user: self.user.getAuthObject()});
-            });
-
-            /**
-             * Fires when a new client connects. The new client create a new host peer
-             * for every client in the mesh that it needs to connec tto
-             */
-            self.server.signal.on('inithosts', function (numHosts) {
-                console.log("init (" + numHosts + ") hosts");
-
-                for(var i=0;i<numHosts;i++) {
-
-                    var peer = new PeerConnection(self.server.signal, true, self.user.preferredBandwidth);
-                    var id = peer.id;
-                    console.log("Created host id " + id);
-                    //Add this peer to the connections[id] and also reactive for vue
-                    self.$set(self.connections, id, peer);
-
-                    self.connections[id].connection.on('connect', function() {
-                        console.log("Connection established between host -> client");
-                        self.ui.sound.play('connect');
-
-                        self.outputConnections();
-
-                        if(self.stream.videoenabled || self.stream.screenshareenabled) {
-                            console.log("Try and send a stream to " + this._id);
-                            self.sendStream(this._id);
-                        }
-                    });
-
-                    self.connections[id].connection.on('close', function() {self.handlePeerDisconnect(this._id);});
-                    self.connections[id].connection.on('error', function() {self.handlePeerDisconnect(this._id);});
-
-                    self.connections[id].connection.on('data', function(data) {
-                        self.recieveData(this._id, self.connections[this._id].user, data);
-                    });
-
-                    self.connections[id].connection.on('stream', function(stream) {
-                        //console.log("Recieved peer stream");
-                        self.onPeerStream(stream, this._id);
-                    });
-                }
-            });
-
-            /**
-             * Fires when the client has generated a WebRTC token and it needs to get back to the host
-             */
-            self.server.signal.on('sendtohost', function (obj) {
-                //Prevent signals to bad hosts that have closed
-                if(typeof self.connections[obj.hostid] != 'undefined' && !self.connections[obj.hostid].connection.destroyed) {
-                    //console.log("host - binding returned client info");
-                    self.connections[obj.hostid].signal(obj.webRtcId);
-                    self.connections[obj.hostid].setUser(obj.user);
-                    self.connections[obj.hostid].setClientId(obj.clientid);
-                } else {
-                    console.log("UH OH");
-                    delete self.connections[obj.hostid];
-                }
-            });
-
-            /**
-             * Fires when a host is looking for clients to connect to
-             * If there's no open client for this match host one will be created
-             */
-            self.server.signal.on('initclient', function (obj) {
-                //console.log("Got request to init a client for host " + obj.hostid);
-                var id=obj.hostid;
-
-                //Key to the host id since it can possibly reqest to init a bunch of times during the handshake
-                if(typeof self.connections[id] == 'undefined') {
-                    //console.log("Init a peer for host " + id);
-                    var peer = new PeerConnection(self.server.signal, false, self.user.preferredBandwidth);
-
-                    self.$set(self.connections, id, peer);
-                    self.connections[id].setHostId(obj.hostid);
-                    self.connections[id].setUser(obj.user);
-
-                    self.connections[id].connection.on('connect', function() {
-                        console.log("Connection established between client -> host");
-                        //console.log(this);
-                        //console.log(self.connections[id].user);
-                        self.ui.sound.play('connect');
-
-                        self.outputConnections();
-                        if(self.stream.videoenabled || self.stream.screenshareenabled) {
-                            console.log("Try and send a client stream to " + id);
-                            self.sendStream(id);
-                        }
-                    });
-
-                    self.connections[id].connection.on('close', function() {self.handlePeerDisconnect(id);});
-                    self.connections[id].connection.on('error', function() {self.handlePeerDisconnect(id);});
-
-                    self.connections[id].connection.on('data', function(data) {
-                        self.recieveData(id, self.connections[id].user, data);
-                    });
-
-                    self.connections[id].connection.on('stream', stream => {self.onPeerStream(stream, id); });
-                }
-                //Use the remote host id so that the client is overridden if it re-signals
-
-
-                //console.log("Signal host (" + obj.hostid + ") connection to client");
-                self.connections[id].signal(obj.webRtcId);
-
-
+            Connections.on('message', function(e) {
+                //console.log("ON MESSAGE TRIGGERED!?!");
+                //console.log(e);
+                self.ui.sound.play('message');
+                //Add the elements in reverse so that the log trickles from the bottom up
+                self.chatLog.push({index: self.chatLog.length, message: e.data.data, user: e.user, self: e.writeSelf});
             });
 
         }
