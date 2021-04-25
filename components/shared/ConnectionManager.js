@@ -2,11 +2,24 @@ import PeerConnection from './PeerConnection.js';
 import Message from './Message.js';
 
 export default class ConnectionManager {
+    // PeerConnection instances
     static connections = [];
+
     static io = require('socket.io-client');
     static server = {ip:'devbevy.chat', port:1337, signal: null};
     static user = {};
     static events = [];
+
+    // The users stream
+    static stream = {videoenabled: false, audioenabled:true, screenshareenabled: false, connection: null, local:null, localsize:'md', volume:0};
+
+    static getConnections() {return ConnectionManager.connections;}
+    static getStream() {return ConnectionManager.stream;}
+    static setStream(stream) {ConnectionManager.stream = stream;}
+    static setStreamProp(key, value) {
+        ConnectionManager.stream[key] = value;
+        ConnectionManager.trigger('streamUpdate');
+    }
 
     constructor() {}
 
@@ -28,7 +41,8 @@ export default class ConnectionManager {
         })
     }
 
-    static getConnections() {return ConnectionManager.connections;}
+
+
     static connect(chatId, user) {
         ConnectionManager.user = user;
 
@@ -66,14 +80,15 @@ export default class ConnectionManager {
                 ConnectionManager.connections[id].connection.on('connect', function() {
                     console.log("Connection established between host -> client");
                     ConnectionManager.trigger('connect', {event: this});
+                    ConnectionManager.sendStream(this._id);
                     //self.ui.sound.play('connect');
 
                     //self.outputConnections();
 
-                    //if(self.stream.videoenabled || self.stream.screenshareenabled) {
-                    //    console.log("Try and send a stream to " + this._id);
-                    //    self.sendStream(this._id);
-                    //}
+                    if(ConnectionManager.stream.videoenabled || ConnectionManager.stream.screenshareenabled) {
+                        console.log("Try and send a stream to " + this._id);
+                        ConnectionManager.sendStream(this._id);
+                    }
                 });
 
                 ConnectionManager.connections[id].connection.on('close', function() {ConnectionManager.handlePeerDisconnect(this._id);});
@@ -127,16 +142,17 @@ export default class ConnectionManager {
                 ConnectionManager.connections[id].connection.on('connect', function() {
                     console.log("Connection established between client -> host");
                     ConnectionManager.trigger('connect', {event: this});
+                    ConnectionManager.sendStream(id);
                     //console.log(this);
                     //console.log(ConnectionManager.connections[id].user);
 
                     //self.ui.sound.play('connect');
 
                     // self.outputConnections();
-                    //if(self.stream.videoenabled || self.stream.screenshareenabled) {
-                    //    console.log("Try and send a client stream to " + id);
-                    //    self.sendStream(id);
-                    //}
+                    if(ConnectionManager.stream.videoenabled || ConnectionManager.stream.screenshareenabled) {
+                        console.log("Try and send a client stream to " + id);
+                        ConnectionManager.sendStream(id);
+                    }
                 });
 
                 ConnectionManager.connections[id].connection.on('close', function() {ConnectionManager.handlePeerDisconnect(id);});
@@ -185,6 +201,30 @@ export default class ConnectionManager {
                 alert("Something went wrong with sendMessage!");
             }
         }
+    }
+
+    //Sends the existing stream to any new peers
+    static sendStream(id) {
+        let self = this;
+
+        if(typeof ConnectionManager.getConnections()[id] == 'undefined'
+            || ConnectionManager.getConnections()[id].connection == null
+            || !ConnectionManager.getConnections()[id].connection.connected
+            || ConnectionManager.getConnections()[id].connection.destroyed) {
+            console.log("Cannot send stream! BAD CONNECTION TO " + id);
+            console.log(ConnectionManager.getConnections()[id]);
+            return false;
+        }
+
+        if((ConnectionManager.stream.videoenabled  || ConnectionManager.stream.screenshareenabled) && !ConnectionManager.getConnections()[id].isStreaming) {
+            //console.log("+APPLYING STREAM");
+            ConnectionManager.getConnections()[id].addStream(ConnectionManager.stream.connection);
+            ConnectionManager.trigger('streamUpdate');
+
+            //Let them know the state of the microphone
+            ConnectionManager.getConnections()[id].send(Message.pack({muted: !ConnectionManager.stream.audioenabled}, 'event'));
+        }
+
     }
 
     static recieveData(id, user, data, writeSelf = false) {

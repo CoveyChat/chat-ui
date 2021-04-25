@@ -34,6 +34,9 @@ export default {
         chatName: String
     },
     computed: {
+        stream: function() {
+            return ConnectionManager.getStream();
+        },
         peerStreams: function() {
             let self = this;
 
@@ -45,23 +48,23 @@ export default {
         currentVolume() {
             let self = this;
             //return 100;
-            if(self.stream.volume == 0) {
+            if(ConnectionManager.getStream().volume == 0) {
                 return 0;
             }
             //Normalize 0-30 as 0-100
-            var vol = Math.round((self.stream.volume / 30) * 100);
+            var vol = Math.round((ConnectionManager.getStream().volume / 30) * 100);
 
             return vol > 100 ? 100 : vol;
         },
         saturatedVolume() {
             let self = this;
             //return 10;
-            if(self.stream.volume == 0) {
+            if(ConnectionManager.getStream().volume == 0) {
                 return 0;
             }
 
             //Anything over 30 is "saturated"
-            var vol = Math.round((self.stream.volume / 30) * 100);
+            var vol = Math.round((ConnectionManager.getStream().volume / 30) * 100);
             var saturated = vol > 100 ? vol-100 : 0;
 
             if(saturated == 0) {
@@ -81,7 +84,6 @@ export default {
             chatLog: [],
             chatId: null,
             user: {active: false},
-            stream: {videoenabled: false, audioenabled:true, screenshareenabled: false, connection: null, local:null, localsize:'md', volume:0},
             ui: {
                 chatDrawer: null,
                 deviceAccess: true,
@@ -122,10 +124,10 @@ export default {
                     self.user.preferredBandwidth = preferred.bandwidth;
 
                     //If we're currently streaming, turn it off
-                    if(self.stream.videoenabled) {
+                    if(ConnectionManager.getStream().videoenabled) {
                         self.stopLocalStream();
-                        self.stream.videoenabled = false;
-                        self.stream.screenshareenabled = false;
+                        ConnectionManager.setStreamProp('videoenabled', false);
+                        ConnectionManager.setStreamProp('screenshareenabled', false);
                     }
                 }
 
@@ -168,7 +170,7 @@ export default {
                 //Let everyone know I'm leaving so they don't sit then hanging
                 for(var id in ConnectionManager.getConnections()) {
                     //If we're streaming to them then kill it
-                    ConnectionManager.getConnections()[id].removeStream(self.stream.connection);
+                    ConnectionManager.getConnections()[id].removeStream(ConnectionManager.getStream().connection);
                     ConnectionManager.getConnections()[id].destroy();
                 }
                 //Go back to the homepage
@@ -202,18 +204,18 @@ export default {
                 audio: self.user.devices.audio.length > 0
             };
 
-            if(self.stream.videoenabled && !self.stream.screenshareenabled) {
+            if(ConnectionManager.getStream().videoenabled && !ConnectionManager.getStream().screenshareenabled) {
                 //console.log(options);
                 //Even with audio:true getDisplayMedia doesn't return audio tracks but since we're replacing
                 //The video stream it preserves the audio track
                 navigator.mediaDevices.getDisplayMedia(options).then(function(stream) {
-                    self.stream.videoenabled = false;
-                    self.stream.screenshareenabled = true;
+                    ConnectionManager.setStreamProp('videoenabled', false);
+                    ConnectionManager.setStreamProp('screenshareenabled', true);
                     self.onLocalStream(stream);
 
 
                 }).catch((e) => {
-                    self.stream.screenshareenabled = false;
+                    ConnectionManager.setStreamProp('screenshareenabled', false);
                     console.log("Local Screenshare Stream Error!");
                     console.log(e);
                     console.log(e.code);
@@ -228,9 +230,9 @@ export default {
                         });
                     }
                 });
-            } else if(self.stream.screenshareenabled) {
+            } else if(ConnectionManager.getStream().screenshareenabled) {
                 console.log("Turning screenshare off");
-                self.stream.screenshareenabled = false;
+                ConnectionManager.setStreamProp('screenshareenabled', false);
                 self.toggleVideo({'message': "toggling back to local video from screenshare"});
             }
         },
@@ -238,14 +240,14 @@ export default {
             let self = this;
             var position = e.target.getBoundingClientRect();
 
-            if(self.stream.localsize == 'lg') {
-                self.stream.localsize = 'md'
-            } else if(self.stream.localsize == 'md') {
-                self.stream.localsize = 'sm'
+            if(ConnectionManager.getStream().localsize == 'lg') {
+                ConnectionManager.setStreamProp('localsize', 'md');
+            } else if(ConnectionManager.getStream().localsize == 'md') {
+                ConnectionManager.setStreamProp('localsize', 'sm');
                 e.target.style.top = (position.y + 10) + "px"
                 e.target.style.left = (position.x + 50) + "px"
-            } else if(self.stream.localsize == 'sm') {
-                self.stream.localsize = 'md'
+            } else if(ConnectionManager.getStream().localsize == 'sm') {
+                ConnectionManager.setStreamProp('localsize', 'md');
                 e.target.style.top = (position.y - 50) + "px"
                 e.target.style.left = (position.x - 50) + "px"
             }
@@ -278,14 +280,14 @@ export default {
         },
         toggleAudio(e) {
             let self = this;
-            if((self.stream.videoenabled || self.stream.screenshareenabled) && self.stream.audioenabled) {
-                self.stream.audioenabled = false;
-                self.setLocalAudio(self.stream.connection, false);
+            if((ConnectionManager.getStream().videoenabled || ConnectionManager.getStream().screenshareenabled) && ConnectionManager.getStream().audioenabled) {
+                ConnectionManager.setStreamProp('audioenabled', false);
+                self.setLocalAudio(ConnectionManager.getStream().connection, false);
 
                 Message.broadcast(ConnectionManager.getConnections(), Message.pack({muted:true}, 'event'));
-            } else if((self.stream.videoenabled || self.stream.screenshareenabled) && !self.stream.audioenabled) {
-                self.stream.audioenabled = true;
-                self.setLocalAudio(self.stream.connection, true);
+            } else if((ConnectionManager.getStream().videoenabled || ConnectionManager.getStream().screenshareenabled) && !ConnectionManager.getStream().audioenabled) {
+                ConnectionManager.setStreamProp('audioenabled', true);
+                self.setLocalAudio(ConnectionManager.getStream().connection, true);
 
                 Message.broadcast(ConnectionManager.getConnections(), Message.pack({muted:false}, 'event'));
             }
@@ -326,13 +328,13 @@ export default {
 
             try {
                 navigator.mediaDevices.getUserMedia(options).then(function(stream) {
-                    self.stream.videoenabled = true;
-                    self.stream.screenshareenabled = false;
+                    ConnectionManager.setStreamProp('videoenabled', true);
+                    ConnectionManager.setStreamProp('screenshareenabled', false);
 
                     self.onLocalStream(stream);
                 }).catch((e) => {
-                    self.stream.videoenabled = false;
-                    self.stream.screenshareenabled = false;
+                    ConnectionManager.setStreamProp('videoenabled', false);
+                    ConnectionManager.setStreamProp('screenshareenabled', false);
                     //They have devices but are probably blocked
                     var modal = new Modal(self.$refs.modalcontainer, {
                         header: "<h1>Uh oh!</h1>",
@@ -352,7 +354,7 @@ export default {
             //Disables the local camera stream
             let self = this;
             self.stopLocalStream();
-            self.stream.videoenabled = false;
+            ConnectionManager.setStreamProp('videoenabled', false);
         },
         toggleVideo(e) {
             let self = this;
@@ -362,7 +364,7 @@ export default {
                 return;
             }
 
-            if(!self.stream.videoenabled) {
+            if(!ConnectionManager.getStream().videoenabled) {
                 self.enableVideo();
             } else {
                 self.disableVideo();
@@ -488,11 +490,11 @@ export default {
                 }
 
                 var average = values / length;
-                //console.log("Volume: " + self.stream.volume);
-                self.stream.volume = Math.round(average);
+                //console.log("Volume: " + ConnectionManager.getStream().volume);
+                ConnectionManager.getStream().volume = Math.round(average);
 
                 //Gain from 0.00 - 1 when volume is below 20
-                //var newGain = (self.stream.volume < 10 ? Math.abs((self.stream.volume / 10) - 1) : 0);
+                //var newGain = (ConnectionManager.getStream().volume < 10 ? Math.abs((ConnectionManager.getStream().volume / 10) - 1) : 0);
 
                 //console.log(newGain);
                 //gainNode.gain.value = newGain;
@@ -506,20 +508,20 @@ export default {
             let self = this;
 
             var replace = false;
-            self.stream.volume = 0;
+            ConnectionManager.setStreamProp('volume', 0);
 
             //New stream connection. Just send it
-            if(!self.stream.connection) {
-                self.stream.connection = stream;
+            if(!ConnectionManager.getStream().connection) {
+                ConnectionManager.setStreamProp('connection', stream);
 
                 //Set this new streams audio settings
-                self.setLocalAudio(stream, self.stream.audioenabled);
+                self.setLocalAudio(stream, ConnectionManager.getStream().audioenabled);
             } else {
                 //Pre-existing stream
                 replace = true;
             }
 
-            self.bindVolume(self.stream.connection);
+            self.bindVolume(ConnectionManager.getStream().connection);
 
             //New Local stream! Send it off  to all the peers
             for(var id in ConnectionManager.getConnections()) {
@@ -534,65 +536,43 @@ export default {
                 //has old tracks. Replace instead of add
                 if(replace) {
                     //Replace the stream in the peer connection
-                    ConnectionManager.getConnections()[id].replaceStream(self.stream.connection, stream);
+                    ConnectionManager.getConnections()[id].replaceStream(ConnectionManager.getStream().connection, stream);
                 } else {
-                    ConnectionManager.getConnections()[id].addStream(self.stream.connection);
+                    ConnectionManager.getConnections()[id].addStream(ConnectionManager.getStream().connection);
                 }
             }
 
             if(replace) {
                 //Also update the stream connection so the local video is correct
-                var oldTracks = self.stream.connection.getVideoTracks();
+                var oldTracks = ConnectionManager.getStream().connection.getVideoTracks();
                 var newTracks = stream.getVideoTracks();
 
-                self.stream.connection.removeTrack(oldTracks[0]);
-                self.stream.connection.addTrack(newTracks[0]);
-            }
-
-        },
-        //Sends the existing stream to any new peers
-        sendStream(id) {
-            let self = this;
-
-            if(typeof ConnectionManager.getConnections()[id] == 'undefined'
-                || ConnectionManager.getConnections()[id].connection == null
-                || !ConnectionManager.getConnections()[id].connection.connected
-                || ConnectionManager.getConnections()[id].connection.destroyed) {
-                console.log("Cannot send stream! BAD CONNECTION TO " + id);
-                console.log(ConnectionManager.getConnections()[id]);
-                return false;
-            }
-
-            if((self.stream.videoenabled  || self.stream.screenshareenabled) && !ConnectionManager.getConnections()[id].isStreaming) {
-                //console.log("+APPLYING STREAM");
-                ConnectionManager.getConnections()[id].addStream(self.stream.connection);
-
-                //Let them know the state of the microphone
-                ConnectionManager.getConnections()[id].send(Message.pack({muted:!self.stream.audioenabled}, 'event'));
+                ConnectionManager.getStream().connection.removeTrack(oldTracks[0]);
+                ConnectionManager.getStream().connection.addTrack(newTracks[0]);
             }
 
         },
         stopLocalStream() {
             let self = this;
 
-            if(!self.stream.videoenabled && !self.stream.screenshareenabled) {return}
+            if(!ConnectionManager.getStream().videoenabled && !ConnectionManager.getStream().screenshareenabled) {return}
 
             //Remove this stream to all the peers so they don't need to do the timeout removal
             for(var id in ConnectionManager.getConnections()) {
                 if(!ConnectionManager.getConnections()[id].isStreaming) {
                     continue;
                 }
-                ConnectionManager.getConnections()[id].removeStream(self.stream.connection);
+                ConnectionManager.getConnections()[id].removeStream(ConnectionManager.getStream().connection);
             }
 
             //Also remove it from the UI / Kill the feed
-            var tracks = self.stream.connection.getTracks();
+            var tracks = ConnectionManager.getStream().connection.getTracks();
 
             tracks.forEach(function(track) {
                 track.stop();
             });
 
-            self.stream.connection = null;
+            ConnectionManager.setStreamProp('connection', null);
         },
         init() {
             let self = this;
@@ -619,6 +599,10 @@ export default {
             ConnectionManager.on('peerStream', function(e) {
                 self.onPeerStream(e.stream, e.id);
             })
+
+            ConnectionManager.on('streamUpdate', function(e) {
+                self.$forceUpdate();
+            });
 
 
 
