@@ -616,6 +616,10 @@ export default {
                 self.$forceUpdate();
             });
 
+            ConnectionManager.on('peerStream', function(e) {
+                self.onPeerStream(e.stream, e.id);
+            })
+
 
 
         }

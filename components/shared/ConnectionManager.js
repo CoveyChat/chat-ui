@@ -84,8 +84,7 @@ export default class ConnectionManager {
                 });
 
                 ConnectionManager.connections[id].connection.on('stream', function(stream) {
-                    //console.log("Recieved peer stream");
-                    self.onPeerStream(stream, this._id);
+                    ConnectionManager.trigger('peerStream', {id: this._id, stream: stream});
                 });
             }
         });
@@ -147,7 +146,9 @@ export default class ConnectionManager {
                     ConnectionManager.recieveData(id, ConnectionManager.connections[id].user, data);
                 });
 
-                ConnectionManager.connections[id].connection.on('stream', stream => {self.onPeerStream(stream, id); });
+                ConnectionManager.connections[id].connection.on('stream', stream => {
+                    ConnectionManager.trigger('peerStream', {id: id, stream: stream});
+                });
             }
             //Use the remote host id so that the client is overridden if it re-signals
 
