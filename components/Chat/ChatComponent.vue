@@ -7,7 +7,7 @@ import Draggable from '../directives/Draggable.js';
 import SoundEffect from '../shared/SoundEffect.js';
 import User from '../shared/User.js';
 import Message from '../shared/Message.js';
-import Connections from '../shared/Connections.js';
+import ConnectionManager from '../shared/ConnectionManager.js';
 import PeerConnection from '../shared/PeerConnection.js';
 import Modal from '../shared/Modal.js';
 import ModalSettingsComponent from './ModalSettingsComponent.vue';
@@ -34,15 +34,12 @@ export default {
         chatName: String
     },
     computed: {
-        connections: function() {
-            return Connections.getConnections();
-        },
         peerStreams: function() {
             let self = this;
 
             //Only return peer connections that have a stream object
-            return Object.keys(Connections.getConnections())
-                .map(key => Connections.getConnections()[key]) // turn an array of keys into array of items.
+            return Object.keys(ConnectionManager.getConnections())
+                .map(key => ConnectionManager.getConnections()[key]) // turn an array of keys into array of items.
                 .filter(peer =>  peer.stream != null); // filter that array,
         },
         currentVolume() {
@@ -80,6 +77,7 @@ export default {
     },
     data: function () {
         return {
+            connections: [],
             chatLog: [],
             chatId: null,
             user: {active: false},
@@ -139,12 +137,12 @@ export default {
                 self.user.preferredBandwidth = preferred.bandwidth;
 
                 //Update the preferred bandwidth on all it's peers
-                for(let id in Connections.getConnections()) {
+                for(let id in ConnectionManager.getConnections()) {
                     //If we're streaming to them then kill it
-                    Connections.getConnections()[id].setPreferredBandwidth(preferred.bandwidth);
+                    ConnectionManager.getConnections()[id].setPreferredBandwidth(preferred.bandwidth);
 
                     //renegotiate the connection for the new quality
-                    Connections.getConnections()[id].connection.negotiate();
+                    ConnectionManager.getConnections()[id].connection.negotiate();
                 }
 
             });
@@ -168,10 +166,10 @@ export default {
 
             modal.$on('confirm', function(e) {
                 //Let everyone know I'm leaving so they don't sit then hanging
-                for(var id in Connections.getConnections()) {
+                for(var id in ConnectionManager.getConnections()) {
                     //If we're streaming to them then kill it
-                    Connections.getConnections()[id].removeStream(self.stream.connection);
-                    Connections.getConnections()[id].destroy();
+                    ConnectionManager.getConnections()[id].removeStream(self.stream.connection);
+                    ConnectionManager.getConnections()[id].destroy();
                 }
                 //Go back to the homepage
                 window.location.href = '/';
@@ -284,12 +282,12 @@ export default {
                 self.stream.audioenabled = false;
                 self.setLocalAudio(self.stream.connection, false);
 
-                Message.broadcast(Connections.getConnections(), Message.pack({muted:true}, 'event'));
+                Message.broadcast(ConnectionManager.getConnections(), Message.pack({muted:true}, 'event'));
             } else if((self.stream.videoenabled || self.stream.screenshareenabled) && !self.stream.audioenabled) {
                 self.stream.audioenabled = true;
                 self.setLocalAudio(self.stream.connection, true);
 
-                Message.broadcast(Connections.getConnections(), Message.pack({muted:false}, 'event'));
+                Message.broadcast(ConnectionManager.getConnections(), Message.pack({muted:false}, 'event'));
             }
         },
         setLocalAudio(stream, enabled) {
@@ -372,46 +370,8 @@ export default {
 
         },
         sendMessage (message) {
-            Connections.sendMessage(message);
+            ConnectionManager.sendMessage(message);
         },
-
-        /*outputConnections () {
-            let self = this;
-
-            //Update for anything that's binding to Object.keys
-            self.$forceUpdate();
-
-            var networkChartData = {nodes:[{id: 'me', name: 'Me'}], links:[]};
-
-
-            for(var id in Connections.getConnections()) {
-                var peer = Connections.getConnections()[id];
-                var name = typeof peer.user != 'undefined' ? peer.user.name : 'X';
-
-                //This is the host connection and it's actually bound to someone
-                if(typeof peer != 'undefined' && peer.initiator && peer.clientid != null) {
-                    //When you have the host connection
-                    networkChartData.nodes.push({id: peer.clientid, name: name, status: 'client'}); //C For client
-                    //networkChartData.nodes.push({id: host.clientid, name: host.clientid.substring(0,2)});
-                    networkChartData.links.push({source: peer.clientid, target: 'me'});
-
-                    //txtConnections.textContent += peer.id + " <--- " + peer.clientid + "\n";
-                } else if(typeof peer != 'undefined' && peer.hostid != null) {
-
-                    //When you're a client of a host
-                    networkChartData.nodes.push({id: peer.hostid, name: name, status: 'host'}); //H for host
-                    //networkChartData.nodes.push({id: id, name: id.substring(0,2)});
-                    networkChartData.links.push({source: 'me', target: peer.hostid});
-
-                    //txtConnections.textContent += peer.id + " ---> " + peer.hostid + "\n";
-                }
-
-            }
-            //console.log("Sending");
-            //console.log(networkChartData);
-            //self.$refs.networkGraph.update(networkChartData);
-
-        },*/
         /**
          * When a peer opens a stream, show the new connection
          */
@@ -421,19 +381,19 @@ export default {
             /*console.log("On peer stream called @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             console.log(stream);
             console.log(peerid);
-            console.log(Connections.getConnections());*/
+            console.log(ConnectionManager.getConnections());*/
 
             /*
             Check for duplicates across all peers incase buttons are spammed
             Sometimes a second connection will still be waiting to close and we don't want to
             renegotiate otherwise the connection will be re-established and not close
             */
-            for(var id in Connections.getConnections()) {
+            for(var id in ConnectionManager.getConnections()) {
                 //Duplicate stream! Ignore it
-                if(Connections.getConnections()[id].stream != null && Connections.getConnections()[id].stream.id == stream.id) {
+                if(ConnectionManager.getConnections()[id].stream != null && ConnectionManager.getConnections()[id].stream.id == stream.id) {
                     //This stream already existed on this id
                     //Seems we have 2 connections open. Destroy the duplicate!
-                    Connections.getConnections()[id].destroy();
+                    ConnectionManager.getConnections()[id].destroy();
                     //self.outputConnections();
                 }
             }
@@ -443,25 +403,25 @@ export default {
             if(self.ui.fullscreen.target == peerid) {
                 //console.log("Rebind!");
                 //We found our stream so we don't want to rebind anymore
-                Connections.getConnections()[peerid].startFullscreen = true;
+                ConnectionManager.getConnections()[peerid].startFullscreen = true;
 
             } else {
                 //console.log("Don't bind!");
-                Connections.getConnections()[peerid].startFullscreen = false;
+                ConnectionManager.getConnections()[peerid].startFullscreen = false;
             }
             //console.log("--------------------------------------------");
             //console.log("Set stream for peer " + peerid);
-            Connections.getConnections()[peerid].setStream(stream);
+            ConnectionManager.getConnections()[peerid].setStream(stream);
 
-            //self.$set(Connections.getConnections()[peerid], 'stream', stream);
+            //self.$set(ConnectionManager.getConnections()[peerid], 'stream', stream);
 
             /**
              * Fires twice. Once when the audio is removed and once when the video is removed
              */
             stream.onremovetrack = function(e) {
                 console.log("on remove track");
-                Connections.getConnections()[peerid].clearPeerStream();
-                //self.$set(Connections.getConnections()[peerid], 'stream', null);
+                ConnectionManager.getConnections()[peerid].clearPeerStream();
+                //self.$set(ConnectionManager.getConnections()[peerid], 'stream', null);
 
                 //Make sure we close fullscreen if necessary
                 if(self.ui.fullscreen.active) {
@@ -562,21 +522,21 @@ export default {
             self.bindVolume(self.stream.connection);
 
             //New Local stream! Send it off  to all the peers
-            for(var id in Connections.getConnections()) {
-                if(Connections.getConnections()[id].connection == null
-                    || !Connections.getConnections()[id].connection.connected
-                    || Connections.getConnections()[id].connection.destroyed) {
+            for(var id in ConnectionManager.getConnections()) {
+                if(ConnectionManager.getConnections()[id].connection == null
+                    || !ConnectionManager.getConnections()[id].connection.connected
+                    || ConnectionManager.getConnections()[id].connection.destroyed) {
                     //console.log("Don't send stream. Skip bad connection " + id);
-                    //console.log(Connections.getConnections()[id]);
+                    //console.log(ConnectionManager.getConnections()[id]);
                     continue;
                 }
 
                 //has old tracks. Replace instead of add
                 if(replace) {
                     //Replace the stream in the peer connection
-                    Connections.getConnections()[id].replaceStream(self.stream.connection, stream);
+                    ConnectionManager.getConnections()[id].replaceStream(self.stream.connection, stream);
                 } else {
-                    Connections.getConnections()[id].addStream(self.stream.connection);
+                    ConnectionManager.getConnections()[id].addStream(self.stream.connection);
                 }
             }
 
@@ -594,21 +554,21 @@ export default {
         sendStream(id) {
             let self = this;
 
-            if(typeof Connections.getConnections()[id] == 'undefined'
-                || Connections.getConnections()[id].connection == null
-                || !Connections.getConnections()[id].connection.connected
-                || Connections.getConnections()[id].connection.destroyed) {
+            if(typeof ConnectionManager.getConnections()[id] == 'undefined'
+                || ConnectionManager.getConnections()[id].connection == null
+                || !ConnectionManager.getConnections()[id].connection.connected
+                || ConnectionManager.getConnections()[id].connection.destroyed) {
                 console.log("Cannot send stream! BAD CONNECTION TO " + id);
-                console.log(Connections.getConnections()[id]);
+                console.log(ConnectionManager.getConnections()[id]);
                 return false;
             }
 
-            if((self.stream.videoenabled  || self.stream.screenshareenabled) && !Connections.getConnections()[id].isStreaming) {
+            if((self.stream.videoenabled  || self.stream.screenshareenabled) && !ConnectionManager.getConnections()[id].isStreaming) {
                 //console.log("+APPLYING STREAM");
-                Connections.getConnections()[id].addStream(self.stream.connection);
+                ConnectionManager.getConnections()[id].addStream(self.stream.connection);
 
                 //Let them know the state of the microphone
-                Connections.getConnections()[id].send(Message.pack({muted:!self.stream.audioenabled}, 'event'));
+                ConnectionManager.getConnections()[id].send(Message.pack({muted:!self.stream.audioenabled}, 'event'));
             }
 
         },
@@ -618,11 +578,11 @@ export default {
             if(!self.stream.videoenabled && !self.stream.screenshareenabled) {return}
 
             //Remove this stream to all the peers so they don't need to do the timeout removal
-            for(var id in Connections.getConnections()) {
-                if(!Connections.getConnections()[id].isStreaming) {
+            for(var id in ConnectionManager.getConnections()) {
+                if(!ConnectionManager.getConnections()[id].isStreaming) {
                     continue;
                 }
-                Connections.getConnections()[id].removeStream(self.stream.connection);
+                ConnectionManager.getConnections()[id].removeStream(self.stream.connection);
             }
 
             //Also remove it from the UI / Kill the feed
@@ -639,15 +599,24 @@ export default {
 
             self.chatId = location.pathname.replace('/chat/', '');
 
-            Connections.connect(self.chatId, self.user);
+            ConnectionManager.connect(self.chatId, self.user);
 
-            Connections.on('message', function(e) {
+            ConnectionManager.on('message', function(e) {
                 //console.log("ON MESSAGE TRIGGERED!?!");
                 //console.log(e);
                 self.ui.sound.play('message');
                 //Add the elements in reverse so that the log trickles from the bottom up
                 self.chatLog.push({index: self.chatLog.length, message: e.data.data, user: e.user, self: e.writeSelf});
             });
+
+            ConnectionManager.on('connect', function(e) {
+                self.ui.sound.play('connect');
+                console.log("NEW CONNECTION!!!!!");
+                self.connections = Object.values(ConnectionManager.getConnections());
+                self.$forceUpdate();
+            });
+
+
 
         }
     },
