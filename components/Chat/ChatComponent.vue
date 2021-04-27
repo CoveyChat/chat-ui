@@ -380,28 +380,6 @@ export default {
         onPeerStream(stream, peerid) {
             let self = this;
 
-            /*console.log("On peer stream called @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-            console.log(stream);
-            console.log(peerid);
-            console.log(ConnectionManager.getConnections());*/
-
-            /*
-            Check for duplicates across all peers incase buttons are spammed
-            Sometimes a second connection will still be waiting to close and we don't want to
-            renegotiate otherwise the connection will be re-established and not close
-            */
-            for(var id in ConnectionManager.getConnections()) {
-                //Duplicate stream! Ignore it
-                if(ConnectionManager.getConnections()[id].stream != null && ConnectionManager.getConnections()[id].stream.id == stream.id) {
-                    //This stream already existed on this id
-                    //Seems we have 2 connections open. Destroy the duplicate!
-                    ConnectionManager.getConnections()[id].destroy();
-                    //self.outputConnections();
-                }
-            }
-
-
-
             if(self.ui.fullscreen.target == peerid) {
                 //console.log("Rebind!");
                 //We found our stream so we don't want to rebind anymore
@@ -411,19 +389,8 @@ export default {
                 //console.log("Don't bind!");
                 ConnectionManager.getConnections()[peerid].startFullscreen = false;
             }
-            //console.log("--------------------------------------------");
-            //console.log("Set stream for peer " + peerid);
-            ConnectionManager.getConnections()[peerid].setStream(stream);
 
-            //self.$set(ConnectionManager.getConnections()[peerid], 'stream', stream);
-
-            /**
-             * Fires twice. Once when the audio is removed and once when the video is removed
-             */
             stream.onremovetrack = function(e) {
-                console.log("on remove track");
-                ConnectionManager.getConnections()[peerid].clearPeerStream();
-                //self.$set(ConnectionManager.getConnections()[peerid], 'stream', null);
 
                 //Make sure we close fullscreen if necessary
                 if(self.ui.fullscreen.active) {
