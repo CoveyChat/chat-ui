@@ -6,7 +6,7 @@ export default class ConnectionManager {
     static connections = [];
 
     static io = require('socket.io-client');
-    static server = {ip:'devbevy.chat', port:1337, signal: null};
+    static server = {ip: process.env.IP, port: process.env.PORT, signal: null};
     static user = {};
     static events = [];
 
@@ -246,6 +246,89 @@ export default class ConnectionManager {
             }
 
         }
+    }
+
+    static setLocalStream(stream) {
+        var replace = false;
+        ConnectionManager.setStreamProp('volume', 0);
+
+        //New stream connection. Just send it
+        if(!ConnectionManager.getStream().connection) {
+            ConnectionManager.setStreamProp('connection', stream);
+
+            //Set this new streams audio settings
+            ConnectionManager.trigger('localAudio', {stream: stream, audioenabled: ConnectionManager.getStream().audioenabled});
+        } else {
+            //Pre-existing stream
+            replace = true;
+        }
+
+        ConnectionManager.bindVolume(ConnectionManager.getStream().connection);
+
+        //New Local stream! Send it off  to all the peers
+        for(var id in ConnectionManager.getConnections()) {
+            if(ConnectionManager.getConnections()[id].connection == null
+                || !ConnectionManager.getConnections()[id].connection.connected
+                || ConnectionManager.getConnections()[id].connection.destroyed) {
+                //console.log("Don't send stream. Skip bad connection " + id);
+                //console.log(ConnectionManager.getConnections()[id]);
+                continue;
+            }
+
+            //has old tracks. Replace instead of add
+            if(replace) {
+                //Replace the stream in the peer connection
+                ConnectionManager.getConnections()[id].replaceStream(ConnectionManager.getStream().connection, stream);
+            } else {
+                ConnectionManager.getConnections()[id].addStream(ConnectionManager.getStream().connection);
+            }
+        }
+
+        if(replace) {
+            //Also update the stream connection so the local video is correct
+            var oldTracks = ConnectionManager.getStream().connection.getVideoTracks();
+            var newTracks = stream.getVideoTracks();
+
+            ConnectionManager.getStream().connection.removeTrack(oldTracks[0]);
+            ConnectionManager.getStream().connection.addTrack(newTracks[0]);
+        }
+    }
+
+    static bindVolume(stream) {
+        var audioContext = new AudioContext();
+        var analyser = audioContext.createAnalyser();
+        var microphone = audioContext.createMediaStreamSource(stream);
+        var javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+        //var gainNode = audioContext.createGain();
+
+        analyser.smoothingTimeConstant = 0.8;
+        analyser.fftSize = 1024;
+
+        microphone.connect(analyser);
+        analyser.connect(javascriptNode);
+        //console.log(microphone);
+        javascriptNode.connect(audioContext.destination);
+
+        javascriptNode.onaudioprocess = function() {
+            var array = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(array);
+            var values = 0;
+
+            var length = array.length;
+            for (var i = 0; i < length; i++) {
+                values += (array[i]);
+            }
+
+            var average = values / length;
+            //console.log("Volume: " + ConnectionManager.getStream().volume);
+            ConnectionManager.getStream().volume = Math.round(average);
+
+            //Gain from 0.00 - 1 when volume is below 20
+            //var newGain = (ConnectionManager.getStream().volume < 10 ? Math.abs((ConnectionManager.getStream().volume / 10) - 1) : 0);
+
+            //console.log(newGain);
+            //gainNode.gain.value = newGain;
+        };
     }
 
 }

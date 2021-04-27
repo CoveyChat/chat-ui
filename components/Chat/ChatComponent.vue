@@ -445,111 +445,12 @@ export default {
                 }
             };
         },
-        bindVolume(stream) {
-            let self = this;
-
-            /*
-            let supportedConstraints = navigator.mediaDevices.getSupportedConstraints();
-            console.log(supportedConstraints);
-
-            var audioTracks = stream.getAudioTracks();
-            if(audioTracks.length > 0) {
-                audioTracks[0].applyConstraints({autoGainControl: true});
-                var constraints = audioTracks[0].getConstraints();
-                console.log("Audio Constraints:");
-                console.log(audioTracks[0]);
-                console.log(audioTracks[0].getConstraints());
-                console.log(constraints);
-                console.log(constraints.autoGainControl);
-            }
-            */
-
-
-            var audioContext = new AudioContext();
-            var analyser = audioContext.createAnalyser();
-            var microphone = audioContext.createMediaStreamSource(stream);
-            var javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
-            //var gainNode = audioContext.createGain();
-
-            analyser.smoothingTimeConstant = 0.8;
-            analyser.fftSize = 1024;
-
-            microphone.connect(analyser);
-            analyser.connect(javascriptNode);
-            //console.log(microphone);
-            javascriptNode.connect(audioContext.destination);
-
-            javascriptNode.onaudioprocess = function() {
-                var array = new Uint8Array(analyser.frequencyBinCount);
-                analyser.getByteFrequencyData(array);
-                var values = 0;
-
-                var length = array.length;
-                for (var i = 0; i < length; i++) {
-                    values += (array[i]);
-                }
-
-                var average = values / length;
-                //console.log("Volume: " + ConnectionManager.getStream().volume);
-                ConnectionManager.getStream().volume = Math.round(average);
-
-                //Gain from 0.00 - 1 when volume is below 20
-                //var newGain = (ConnectionManager.getStream().volume < 10 ? Math.abs((ConnectionManager.getStream().volume / 10) - 1) : 0);
-
-                //console.log(newGain);
-                //gainNode.gain.value = newGain;
-            };
-        },
         /**
          * Fires when a new local stream object has opened
          * Aka the user clicked the video button
          */
         onLocalStream(stream) {
-            let self = this;
-
-            var replace = false;
-            ConnectionManager.setStreamProp('volume', 0);
-
-            //New stream connection. Just send it
-            if(!ConnectionManager.getStream().connection) {
-                ConnectionManager.setStreamProp('connection', stream);
-
-                //Set this new streams audio settings
-                self.setLocalAudio(stream, ConnectionManager.getStream().audioenabled);
-            } else {
-                //Pre-existing stream
-                replace = true;
-            }
-
-            self.bindVolume(ConnectionManager.getStream().connection);
-
-            //New Local stream! Send it off  to all the peers
-            for(var id in ConnectionManager.getConnections()) {
-                if(ConnectionManager.getConnections()[id].connection == null
-                    || !ConnectionManager.getConnections()[id].connection.connected
-                    || ConnectionManager.getConnections()[id].connection.destroyed) {
-                    //console.log("Don't send stream. Skip bad connection " + id);
-                    //console.log(ConnectionManager.getConnections()[id]);
-                    continue;
-                }
-
-                //has old tracks. Replace instead of add
-                if(replace) {
-                    //Replace the stream in the peer connection
-                    ConnectionManager.getConnections()[id].replaceStream(ConnectionManager.getStream().connection, stream);
-                } else {
-                    ConnectionManager.getConnections()[id].addStream(ConnectionManager.getStream().connection);
-                }
-            }
-
-            if(replace) {
-                //Also update the stream connection so the local video is correct
-                var oldTracks = ConnectionManager.getStream().connection.getVideoTracks();
-                var newTracks = stream.getVideoTracks();
-
-                ConnectionManager.getStream().connection.removeTrack(oldTracks[0]);
-                ConnectionManager.getStream().connection.addTrack(newTracks[0]);
-            }
+            ConnectionManager.setLocalStream(stream);
 
         },
         stopLocalStream() {
@@ -604,32 +505,34 @@ export default {
                 self.$forceUpdate();
             });
 
+            ConnectionManager.on('localAudio', function(e) {
+                self.setLocalAudio(e.stream, e.audioenabled);
+            });
+
 
 
         }
     },
-mounted() {
-    console.log('Chat Component mounted.');
-    //View model reference for inside scoped functions
-    let self = this;
-    self.ui.sound = new SoundEffect();
-    //Hide the video button since they don't support mediaDevices
-    self.ui.deviceAccess = typeof navigator.mediaDevices != 'undefined';
+    mounted() {
+        console.log('Chat Component mounted.');
+        //View model reference for inside scoped functions
+        let self = this;
+        self.ui.sound = new SoundEffect();
+        //Hide the video button since they don't support mediaDevices
+        self.ui.deviceAccess = typeof navigator.mediaDevices != 'undefined';
 
-    self.user = new User(this.$auth.user || {});
+        self.user = new User(this.$auth.user || {});
 
-    //Discover and set the devices before we init stuff
-    self.user.discoverDevices(function(devices) {
-        //Prompt for a name
-        if(self.user.active) {
-            self.init();
-        }
-    });
+        //Discover and set the devices before we init stuff
+        self.user.discoverDevices(function(devices) {
+            //Prompt for a name
+            if(self.user.active) {
+                self.init();
+            }
+        });
 
+    }
 }
-}
-
-
 
 
 
