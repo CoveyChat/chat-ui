@@ -4,7 +4,7 @@ export default class Model extends BaseModel {
 
   // Define a base url for a REST API
   baseURL() {
-    return 'https://devbevy.chat/api/1.0'
+    return process.env.API_BASE
   }
 
   // Implement a default request method

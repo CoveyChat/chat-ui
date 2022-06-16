@@ -6,7 +6,7 @@ export default class ConnectionManager {
     static connections = [];
 
     static io = require('socket.io-client');
-    static server = {ip: process.env.IP, port: process.env.PORT, signal: null};
+    static server = {ip: process.env.SERVER_IP, port: process.env.PORT, signal: null};
     static user = {};
     static events = [];
 
