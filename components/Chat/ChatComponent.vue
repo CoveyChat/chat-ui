@@ -411,6 +411,8 @@ export default {
                     }
                 }
             };
+
+            self.$forceUpdate();
         },
         /**
          * Fires when a new local stream object has opened
@@ -465,6 +467,7 @@ export default {
             });
 
             ConnectionManager.on('peerStream', function(e) {
+                console.log("ON PEER STREAM");
                 self.onPeerStream(e.stream, e.id);
             })
 

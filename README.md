@@ -1,4 +1,4 @@
-# bevychat-ui
+# covey-ui
 
 ## Build Setup
 

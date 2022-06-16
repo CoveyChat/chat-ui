@@ -100,7 +100,6 @@ export default class ConnectionManager {
 
                 ConnectionManager.connections[id].connection.on('stream', function(stream) {
                     ConnectionManager.setPeerStream(this._id, stream);
-                    ConnectionManager.trigger('peerStream', {id: this._id, stream: stream});
                 });
             }
         });
@@ -208,22 +207,22 @@ export default class ConnectionManager {
     static sendStream(id) {
         let self = this;
 
-        if(typeof ConnectionManager.getConnections()[id] == 'undefined'
-            || ConnectionManager.getConnections()[id].connection == null
-            || !ConnectionManager.getConnections()[id].connection.connected
-            || ConnectionManager.getConnections()[id].connection.destroyed) {
+        if(typeof ConnectionManager.connections[id] == 'undefined'
+            || ConnectionManager.connections[id].connection == null
+            || !ConnectionManager.connections[id].connection.connected
+            || ConnectionManager.connections[id].connection.destroyed) {
             console.log("Cannot send stream! BAD CONNECTION TO " + id);
-            console.log(ConnectionManager.getConnections()[id]);
+            console.log(ConnectionManager.connections[id]);
             return false;
         }
 
-        if((ConnectionManager.stream.videoenabled  || ConnectionManager.stream.screenshareenabled) && !ConnectionManager.getConnections()[id].isStreaming) {
+        if((ConnectionManager.stream.videoenabled  || ConnectionManager.stream.screenshareenabled) && !ConnectionManager.connections[id].isStreaming) {
             //console.log("+APPLYING STREAM");
-            ConnectionManager.getConnections()[id].addStream(ConnectionManager.stream.connection);
+            ConnectionManager.connections[id].addStream(ConnectionManager.stream.connection);
             ConnectionManager.trigger('streamUpdate');
 
             //Let them know the state of the microphone
-            ConnectionManager.getConnections()[id].send(Message.pack({muted: !ConnectionManager.stream.audioenabled}, 'event'));
+            ConnectionManager.connections[id].send(Message.pack({muted: !ConnectionManager.stream.audioenabled}, 'event'));
         }
 
     }
@@ -267,21 +266,21 @@ export default class ConnectionManager {
         ConnectionManager.bindVolume(ConnectionManager.getStream().connection);
 
         //New Local stream! Send it off  to all the peers
-        for(var id in ConnectionManager.getConnections()) {
-            if(ConnectionManager.getConnections()[id].connection == null
-                || !ConnectionManager.getConnections()[id].connection.connected
-                || ConnectionManager.getConnections()[id].connection.destroyed) {
+        for(var id in ConnectionManager.connections) {
+            if(ConnectionManager.connections[id].connection == null
+                || !ConnectionManager.connections[id].connection.connected
+                || ConnectionManager.connections[id].connection.destroyed) {
                 //console.log("Don't send stream. Skip bad connection " + id);
-                //console.log(ConnectionManager.getConnections()[id]);
+                //console.log(ConnectionManager.connections[id]);
                 continue;
             }
 
             //has old tracks. Replace instead of add
             if(replace) {
                 //Replace the stream in the peer connection
-                ConnectionManager.getConnections()[id].replaceStream(ConnectionManager.getStream().connection, stream);
+                ConnectionManager.connections[id].replaceStream(ConnectionManager.getStream().connection, stream);
             } else {
-                ConnectionManager.getConnections()[id].addStream(ConnectionManager.getStream().connection);
+                ConnectionManager.connections[id].addStream(ConnectionManager.getStream().connection);
             }
         }
 
@@ -301,26 +300,28 @@ export default class ConnectionManager {
         Sometimes a second connection will still be waiting to close and we don't want to
         renegotiate otherwise the connection will be re-established and not close
         */
-        for(var id in ConnectionManager.getConnections()) {
+        for(var id in ConnectionManager.connections) {
             //Duplicate stream! Ignore it
-            if(ConnectionManager.getConnections()[id].stream != null && ConnectionManager.getConnections()[id].stream.id == stream.id) {
+            if(ConnectionManager.connections[id].stream != null && ConnectionManager.connections[id].stream.id == stream.id) {
                 //This stream already existed on this id
                 //Seems we have 2 connections open. Destroy the duplicate!
-                ConnectionManager.getConnections()[id].destroy();
+                ConnectionManager.connections[id].destroy();
                 //self.outputConnections();
             }
         }
 
-        ConnectionManager.getConnections()[peerid].setStream(stream);
+        ConnectionManager.connections[peerid].setStream(stream);
 
         /**
          * Fires twice. Once when the audio is removed and once when the video is removed
          */
         stream.onremovetrack = function(e) {
             console.log("on remove track");
-            ConnectionManager.getConnections()[peerid].clearPeerStream();
+            ConnectionManager.connections[peerid].clearPeerStream();
 
         };
+
+        ConnectionManager.trigger('peerStream', {id: peerid, stream: stream});
     }
 
     static bindVolume(stream) {
